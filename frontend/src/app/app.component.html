@@ -26,6 +26,42 @@
 	</div>
 	<div [ngbNavOutlet]="nav" class="ms-4"></div>
 </div>
+<h2>Rutinas</h2>
+<div ngbAccordion [closeOthers]="true">
+	
+	@for (rutina of rutinas; track rutina) {
+		
+		<div ngbAccordionItem [collapsed]="true">
+			<h2 ngbAccordionHeader>
+				<button ngbAccordionButton>{{ rutina.nombre }}</button>
+			</h2>
+			<div ngbAccordionCollapse>
+				<div ngbAccordionBody>
+					<ng-template>
+						<p>{{rutina.descripcion}}</p>
+						<TABLE class = "table table-striped">
+							<THEAD>
+								<TR><TH>Nombre del ejercicio</TH><TH>Series</TH><TH>Repeticiones</TH><TH>Duración (segundos)</TH></TR>
+							</THEAD> 
+							<TBODY>
+							  <TR *ngFor="let ejercicio of rutina.ejercicios">
+								<TD>{{ejercicio.nombre}}</TD>
+								<TD>{{ejercicio.series}}</TD>
+								<TD>{{ejercicio.repeticiones}}</TD>
+								<TD>{{ejercicio.duracion}}</TD>
+							  </TR>
+							</TBODY>
+						</TABLE>
+						<button class="col-auto btn btn-outline-primary">Editar Rutina</button>
+         			 	&nbsp;
+						<button class="col-auto btn btn-outline-danger" (click)="eliminarRutina(rutina)">Eliminar Rutina</button>
+					</ng-template>
+				</div>
+			</div>
+		</div>
+	}
+</div>
+<p></p><button type="button" class="btn btn-outline-success">Añadir Rutina</button><p></p>
 
 
 </body>
