@@ -18,4 +18,51 @@
     max-width: 100%;
     border-radius: 8px;
   }
-  
+
+  .nav-tabs {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    list-style-type: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+/* Estilos para los ítems del nav */
+.nav-tabs li {
+    margin: 0 15px;
+    border-bottom: 3px solid transparent;
+}
+
+.nav-tabs li:hover {
+    border-bottom-color: #007bff; /* Color de la línea inferior al pasar el mouse */
+}
+
+/* Estilos para los botones dentro de los ítems */
+.nav-tabs button {
+    padding: 15px 30px;
+    font-size: 18px; /* Tamaño de fuente más grande */
+    font-weight: bold; /* Texto en negrita */
+    background-color: transparent;
+    color: #333333; /* Color del texto */
+    border: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.nav-tabs button:hover {
+    color: #007bff; /* Color del texto al pasar el mouse */
+    transform: scale(1.1); /* Efecto de escala al pasar el mouse */
+}
+
+/* Estilos para el contenido del nav */
+.ngb-nav-content {
+    padding: 20px;
+    border: 1px solid #e9ecef; /* Borde */
+    background-color: #ffffff; /* Color de fondo */
+}
+
+.table th {
+  background-color: #007bff;
+  color: #ffffff;
+}

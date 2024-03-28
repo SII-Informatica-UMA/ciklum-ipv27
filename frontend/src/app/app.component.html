@@ -5,63 +5,76 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<h2>Ejercicios</h2>
-<div class="d-flex">
-	<div ngbNav #nav="ngbNav" class="nav-pills flex-column" orientation="vertical">
-		<ng-container *ngFor="let ejercicio of ejercicios" ngbNavItem>
-			<button ngbNavLink (click)="elegirEjercicio(ejercicio)" [class.active]="ejercicio === ejercicioElegido">{{ejercicio.nombre}}</button>
-			<ng-template ngbNavContent>
-				<div class="container">
-					<p>{{ejercicio.descripcion}}</p>
-					<iframe width="400" height="250" [src]="getSafeUrl(ejercicio.video)" frameborder="0" allowfullscreen></iframe>
-					<img src="image.jpg" [alt]="ejercicio.imagen">
-					<button class="col-auto btn btn-outline-primary">Editar Ejercicio</button>
-         			 &nbsp;
-          			<button class="col-auto btn btn-outline-danger" (click)="eliminarEjercicio(ejercicio)">Eliminar Ejercicio</button>
-					</div>
-			</ng-template>
-		</ng-container>
-		<br>
-		<button type="button" class="btn btn-outline-success">Añadir Ejercicio</button>
-	</div>
-	<div [ngbNavOutlet]="nav" class="ms-4"></div>
-</div>
-<h2>Rutinas</h2>
-<div ngbAccordion [closeOthers]="true">
-	
-	@for (rutina of rutinas; track rutina) {
-		
-		<div ngbAccordionItem [collapsed]="true">
-			<h2 ngbAccordionHeader>
-				<button ngbAccordionButton>{{ rutina.nombre }}</button>
-			</h2>
-			<div ngbAccordionCollapse>
-				<div ngbAccordionBody>
-					<ng-template>
-						<p>{{rutina.descripcion}}</p>
-						<TABLE class = "table table-striped">
-							<THEAD>
-								<TR><TH>Nombre del ejercicio</TH><TH>Series</TH><TH>Repeticiones</TH><TH>Duración (segundos)</TH></TR>
-							</THEAD> 
-							<TBODY>
-							  <TR *ngFor="let ejercicio of rutina.ejercicios">
-								<TD>{{ejercicio.nombre}}</TD>
-								<TD>{{ejercicio.series}}</TD>
-								<TD>{{ejercicio.repeticiones}}</TD>
-								<TD>{{ejercicio.duracion}}</TD>
-							  </TR>
-							</TBODY>
-						</TABLE>
-						<button class="col-auto btn btn-outline-primary">Editar Rutina</button>
-         			 	&nbsp;
-						<button class="col-auto btn btn-outline-danger" (click)="eliminarRutina(rutina)">Eliminar Rutina</button>
-					</ng-template>
+
+<ul ngbNav #nav="ngbNav" class="nav-tabs">
+	<li [ngbNavItem]="1">
+		<button ngbNavLink>Ejercicios</button>
+		<ng-template ngbNavContent>
+			<div class="d-flex">
+				<div ngbNav #nav="ngbNav" class="nav-pills flex-column" orientation="vertical">
+					<ng-container *ngFor="let ejercicio of ejercicios" ngbNavItem>
+						<button ngbNavLink (click)="elegirEjercicio(ejercicio)" [class.active]="ejercicio === ejercicioElegido">{{ejercicio.nombre}}</button>
+						<ng-template ngbNavContent>
+							<div class="container">
+								<p>{{ejercicio.descripcion}}</p>
+								<iframe width="400" height="250" [src]="getSafeUrl(ejercicio.video)" frameborder="0" allowfullscreen></iframe>
+								<img src="image.jpg" [alt]="ejercicio.imagen">
+								<button class="col-auto btn btn-outline-primary">Editar Ejercicio</button>
+								  &nbsp;
+								  <button class="col-auto btn btn-outline-danger" (click)="eliminarEjercicio(ejercicio)">Eliminar Ejercicio</button>
+								</div>
+						</ng-template>
+					</ng-container>
+					<br>
+					<button type="button" class="btn btn-outline-success">Añadir Ejercicio</button>
 				</div>
+				<div [ngbNavOutlet]="nav" class="ms-4"></div>
 			</div>
-		</div>
-	}
-</div>
-<p></p><button type="button" class="btn btn-outline-success">Añadir Rutina</button><p></p>
+		</ng-template>
+	</li>
+	<li [ngbNavItem]="2">
+		<button ngbNavLink>Rutinas</button>
+		<ng-template ngbNavContent>
+			<div ngbAccordion [closeOthers]="true">
+	
+				@for (rutina of rutinas; track rutina) {
+					
+					<div ngbAccordionItem [collapsed]="true">
+						<h2 ngbAccordionHeader>
+							<button ngbAccordionButton>{{ rutina.nombre }}</button>
+						</h2>
+						<div ngbAccordionCollapse>
+							<div ngbAccordionBody>
+								<ng-template>
+									<p>{{rutina.descripcion}}</p>
+									<TABLE class = "table table-striped">
+										<THEAD>
+											<TR><TH>Nombre del ejercicio</TH><TH>Series</TH><TH>Repeticiones</TH><TH>Duración (segundos)</TH></TR>
+										</THEAD> 
+										<TBODY>
+										  <TR *ngFor="let ejercicio of rutina.ejercicios">
+											<TD>{{ejercicio.nombre}}</TD>
+											<TD>{{ejercicio.series}}</TD>
+											<TD>{{ejercicio.repeticiones}}</TD>
+											<TD>{{ejercicio.duracion}}</TD>
+										  </TR>
+										</TBODY>
+									</TABLE>
+									<button class="col-auto btn btn-outline-primary">Editar Rutina</button>
+									  &nbsp;
+									<button class="col-auto btn btn-outline-danger" (click)="eliminarRutina(rutina)">Eliminar Rutina</button>
+								</ng-template>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+			<p></p><button type="button" class="btn btn-outline-success">Añadir Rutina</button><p></p>
+		</ng-template>
+	</li>
+</ul>
+
+<div [ngbNavOutlet]="nav" class="mt-2"></div>
 
 
 </body>
