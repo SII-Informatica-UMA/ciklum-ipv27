@@ -3,7 +3,9 @@ import {Ejercicio } from './ejercicio';
 import {Rutina } from './rutina';
 import {RutinaService} from './rutina.service';
 import {EjercicioService } from './ejercicio.service';
+import {FormularioRutinaComponent} from './formulario-rutina/formulario-rutina.component'
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import { NgFor } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
@@ -25,7 +27,7 @@ export class AppComponent implements OnInit{
   rutinaElegido?: Rutina;
   
 
-  constructor(private ejercicioService: EjercicioService, private rutinaService: RutinaService,private sanitizer: DomSanitizer) { }
+  constructor(private ejercicioService: EjercicioService, private rutinaService: RutinaService,private sanitizer: DomSanitizer,private modalService: NgbModal) { }
 
  
 
@@ -54,6 +56,17 @@ export class AppComponent implements OnInit{
     this.rutinaService.eliminarRutina(rutina.id);
     this.rutinas = this.rutinaService.getRutinas();
     this.rutinaElegido = undefined;
+  }
+
+  aniadirRutina(): void {
+    let ref = this.modalService.open(FormularioRutinaComponent);
+    ref.componentInstance.accion = "Añadir";
+    ref.componentInstance.rutina = { id: 0, nombre: '', descripcion:'', ejercicios: []};
+    ref.result.then((rutina: Rutina) => {
+      this.rutinaService.addRutina(rutina);
+      this.rutinas = this.rutinaService.getRutinas();
+    }, (reason) => {});
+
   }
 
   getSafeUrl(url: string): SafeResourceUrl {
