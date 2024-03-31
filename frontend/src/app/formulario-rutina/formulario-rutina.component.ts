@@ -4,6 +4,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 
+
 @Component({
   selector: 'app-formulario-rutina',
   templateUrl: './formulario-rutina.component.html',

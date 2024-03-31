@@ -7,7 +7,6 @@ import { FormularioRutinaComponent } from './formulario-rutina/formulario-rutina
 
 @NgModule({
   declarations: [
-    AppComponent,
     FormularioRutinaComponent
   ],
   imports: [
