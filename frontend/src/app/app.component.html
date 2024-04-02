@@ -17,8 +17,8 @@
 						<ng-template ngbNavContent>
 							<div class="container">
 								<p>{{ejercicio.descripcion}}</p>
-								<iframe width="400" height="250" [src]="getSafeUrl(ejercicio.video)" frameborder="0" allowfullscreen></iframe>
-								<img src="image.jpg" [alt]="ejercicio.imagen">
+								<iframe width="400" height="250" [src]="getSafeUrl(ejercicio.multimedia[0])" frameborder="0" allowfullscreen></iframe>
+								<img src="image.jpg" [alt]="ejercicio.multimedia[1]">
 								<button class="col-auto btn btn-outline-primary">Editar Ejercicio</button>
 								  &nbsp;
 								  <button class="col-auto btn btn-outline-danger" (click)="eliminarEjercicio(ejercicio)">Eliminar Ejercicio</button>
@@ -53,10 +53,10 @@
 										</THEAD> 
 										<TBODY>
 										  <TR *ngFor="let ejercicio of rutina.ejercicios">
-											<TD>{{ejercicio.nombre}}</TD>
+											<TD>{{ejercicio.ejercicio.nombre}}</TD>
 											<TD>{{ejercicio.series}}</TD>
 											<TD>{{ejercicio.repeticiones}}</TD>
-											<TD>{{ejercicio.duracion}}</TD>
+											<TD>{{ejercicio.duracionMinutos}}</TD>
 										  </TR>
 										</TBODY>
 									</TABLE>

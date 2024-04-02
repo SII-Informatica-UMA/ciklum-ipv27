@@ -61,7 +61,7 @@ export class AppComponent implements OnInit{
   aniadirRutina(): void {
     let ref = this.modalService.open(FormularioRutinaComponent);
     ref.componentInstance.accion = "Añadir";
-    ref.componentInstance.rutina = { id: 0, nombre: '', descripcion:'', ejercicios: []};
+    ref.componentInstance.rutina = { id: 0, nombre: '', observaciones:'', descripcion:'', ejercicios: []};
     ref.result.then((rutina: Rutina) => {
       this.rutinaService.addRutina(rutina);
       this.rutinas = this.rutinaService.getRutinas();

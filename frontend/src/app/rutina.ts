@@ -4,13 +4,14 @@ export interface Rutina {
     id: number;
     nombre: string;
     descripcion: string;
+    observaciones: string;
     ejercicios: Ejs[];
   }
 
 
 export interface Ejs{
-    nombre: string;
     series: number;
     repeticiones: number;
-    duracion: number;
+    duracionMinutos: number;
+    ejercicio: Ejercicio;
 }

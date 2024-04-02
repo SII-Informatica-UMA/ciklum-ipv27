@@ -12,8 +12,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class FormularioRutinaComponent {
   accion?: "Añadir" | "Editar";
-  ejer: Ejs = { nombre: '', series: 0, repeticiones: 0, duracion: 0};
-  rutina: Rutina = { id: 0, nombre: '', descripcion:'', ejercicios: []};
+  ejer: Ejs = { ejercicio: {id: 0, nombre:'', descripcion:'', observaciones: '', tipo: '', musculosTrabajados:'', material: '', dificultad:'', multimedia: []}, series: 0, repeticiones: 0, duracionMinutos: 0};
+  rutina: Rutina = { id: 0, nombre: '', observaciones:'', descripcion:'', ejercicios: []};
 
   constructor(public modal: NgbActiveModal) { }
 
