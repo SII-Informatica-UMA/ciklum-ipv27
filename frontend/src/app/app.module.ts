@@ -15,6 +15,6 @@ import { FormularioRutinaComponent } from './formulario-rutina/formulario-rutina
     FormsModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap:[AppComponent]
 })
 export class AppModule { }

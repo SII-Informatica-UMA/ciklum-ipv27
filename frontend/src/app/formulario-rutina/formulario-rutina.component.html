@@ -8,6 +8,44 @@
       <input class="form-control" id="nombre" [(ngModel)]="rutina.nombre" placeholder="nombre">
       <label for="descripcion">Descripcion:</label>
       <input class="form-control" id="descripcion" [(ngModel)]="rutina.descripcion" placeholder="descripcion">
+      <label for="observaciones">Observaciones:</label>
+      <input class="form-control" id="observaciones" [(ngModel)]="rutina.observaciones" placeholder="observaciones">
+      <div class="form-group row">
+        <div class="col-md-3">
+          <label for="elegirEjercicio">Ejercicio:</label>
+          <select class="form-control" id="elegirEjercicio" [(ngModel)]="ejer.ejercicio.id">
+            <option *ngFor="let ejercicio of ejerciciosService.getEjercicios()" [value]="ejercicio.id">
+              {{ ejercicio.nombre }}
+            </option>
+          </select>
+        </div>
+      
+        <div class="col-md-2">
+          <label for="series">Series:</label>
+          <input class="form-control" id="series" [(ngModel)]="ejer.series" placeholder="Series">
+        </div>
+      
+        <div class="col-md-2">
+          <label for="repeticiones">Repes:</label>
+          <input class="form-control" id="repeticiones" [(ngModel)]="ejer.repeticiones" placeholder="Repeticiones">
+        </div>
+      
+        <div class="col-md-2">
+          <label for="duracionMinutos">Duración:</label>
+          <input class="form-control" id="duracionMinutos" [(ngModel)]="ejer.duracionMinutos" placeholder="Duración (minutos)">
+        </div>
+      
+        <div class="col-md-3">
+          <button class="btn btn-primary mt-4" (click)="agregarEjercicio()">Agregar</button>
+        </div>
+      </div>
+      
+  </div>
+  <div class="exercise-list" *ngFor="let ejercicio of ejerciciosSeleccionados; let i = index">
+    <div class="exercise-item">
+      <p>{{ ejercicio.ejercicio.nombre }} - Series: {{ ejercicio.series }}, Repes: {{ ejercicio.repeticiones }}, Duración: {{ ejercicio.duracionMinutos }}</p>
+      <button class="btn btn-danger btn-sm" (click)="eliminarEjercicio(i)">Eliminar</button>
+    </div>
   </div>
 </div>
 <div class="modal-footer">
