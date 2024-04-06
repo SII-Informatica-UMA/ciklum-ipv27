@@ -16,9 +16,20 @@
 						<button ngbNavLink (click)="elegirEjercicio(ejercicio)" [class.active]="ejercicio === ejercicioElegido">{{ejercicio.nombre}}</button>
 						<ng-template ngbNavContent>
 							<div class="container">
-								<p>{{ejercicio.descripcion}}</p>
-								<iframe width="400" height="250" [src]="getSafeUrl(ejercicio.multimedia[0])" frameborder="0" allowfullscreen></iframe>
-								<img src="image.jpg" [alt]="ejercicio.multimedia[1]">
+								<p><b>Descripción:</b> {{ejercicio.descripcion}}</p>
+								<p><b>Observaciones:</b> {{ejercicio.observaciones}}</p>
+								<p><b>Tipo:</b> {{ejercicio.tipo}}</p>
+								<p><b>Músculos Trabajados:</b> {{ejercicio.musculosTrabajados}}</p>
+								<p><b>Material:</b> {{ejercicio.material}}</p>
+								<p><b>Dificultad:</b> {{ejercicio.dificultad}}</p>
+								<p><b>Contenido de ayuda: </b></p>
+								<p></p>
+								<ng-container *ngFor="let contenido of ejercicio.multimedia" ngbNavItem>
+									<p><a href={{contenido}} target="_blank">{{contenido}}</a></p>
+									<p></p>
+								</ng-container>
+								<!--<iframe width="400" height="250" [src]="getSafeUrl(ejercicio.multimedia[0])" frameborder="0" allowfullscreen></iframe>
+								<img src="image.jpg" [alt]="ejercicio.multimedia[1]">-->
 								<button class="col-auto btn btn-outline-primary">Editar Ejercicio</button>
 								  &nbsp;
 								  <button class="col-auto btn btn-outline-danger" (click)="eliminarEjercicio(ejercicio)">Eliminar Ejercicio</button>
