@@ -69,6 +69,17 @@ export class AppComponent implements OnInit{
 
   }
 
+  editarRutina(rutina: Rutina): void {
+    let ref = this.modalService.open(FormularioRutinaComponent);
+    ref.componentInstance.accion = "Editar"
+    ref.componentInstance.rutina = {...rutina};
+    ref.componentInstance.ejerciciosSeleccionados = [...rutina.ejercicios];
+    ref.result.then((rutinaEditada: Rutina) => {
+      this.rutinaService.editarRutina(rutinaEditada);
+      this.rutinas = this.rutinaService.getRutinas();
+    }, (reason) => {});
+  }
+
   getSafeUrl(url: string): SafeResourceUrl {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
 

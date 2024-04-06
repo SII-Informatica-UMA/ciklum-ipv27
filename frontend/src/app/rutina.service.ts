@@ -19,6 +19,7 @@ export class RutinaService {
   }
 
 
+
   addRutina(rutina: Rutina) {
     rutina.id = Math.max(...this.rutinas.map(c => c.id)) + 1;
     this.rutinas.push(rutina);

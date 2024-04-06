@@ -49,7 +49,7 @@
 									<p>{{rutina.descripcion}}</p>
 									<TABLE class = "table table-striped">
 										<THEAD>
-											<TR><TH>Nombre del ejercicio</TH><TH>Series</TH><TH>Repeticiones</TH><TH>Duración (segundos)</TH></TR>
+											<TR><TH>Nombre del ejercicio</TH><TH>Series</TH><TH>Repeticiones</TH><TH>Duración (minutos)</TH></TR>
 										</THEAD> 
 										<TBODY>
 										  <TR *ngFor="let ejercicio of rutina.ejercicios">
@@ -60,7 +60,7 @@
 										  </TR>
 										</TBODY>
 									</TABLE>
-									<button class="col-auto btn btn-outline-primary">Editar Rutina</button>
+									<button class="col-auto btn btn-outline-primary"(click)="editarRutina(rutina)">Editar Rutina</button>
 									  &nbsp;
 									<button class="col-auto btn btn-outline-danger" (click)="eliminarRutina(rutina)">Eliminar Rutina</button>
 								</ng-template>
