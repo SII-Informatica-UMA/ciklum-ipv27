@@ -30,14 +30,14 @@
 								</ng-container>
 								<!--<iframe width="400" height="250" [src]="getSafeUrl(ejercicio.multimedia[0])" frameborder="0" allowfullscreen></iframe>
 								<img src="image.jpg" [alt]="ejercicio.multimedia[1]">-->
-								<button class="col-auto btn btn-outline-primary">Editar Ejercicio</button>
+								<button class="col-auto btn btn-outline-primary" (click)="editarEjercicio(ejercicio)">Editar Ejercicio</button>
 								  &nbsp;
 								  <button class="col-auto btn btn-outline-danger" (click)="eliminarEjercicio(ejercicio)">Eliminar Ejercicio</button>
 								</div>
 						</ng-template>
 					</ng-container>
 					<br>
-					<button type="button" class="btn btn-outline-success">Añadir Ejercicio</button>
+					<button type="button" class="btn btn-outline-success" (click)="aniadirEjercicio()">Añadir Ejercicio</button>
 				</div>
 				<div [ngbNavOutlet]="nav" class="ms-4"></div>
 			</div>
