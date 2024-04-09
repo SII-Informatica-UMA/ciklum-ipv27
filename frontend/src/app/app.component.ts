@@ -53,13 +53,12 @@ export class AppComponent implements OnInit{
     this.ejercicioElegido = undefined;
   }
 
-  // Aqui añadir Ejercicio y Editer ejercicio
   
   editarEjercicio(ejercicio: Ejercicio): void {
     let ref = this.modalService.open(FormularioEjercicioComponent);
     ref.componentInstance.accion = "Editar"
     ref.componentInstance.ejercicio = {...ejercicio};
-    // ref.componentInstance.ejerciciosSeleccionados = [...rutina.ejercicios];
+    ref.componentInstance.multimediaSeleccionados = [...ejercicio.multimedia];
     ref.result.then((ejercicioEditado: Ejercicio) => {
       this.ejercicioService.editarEjercicio(ejercicioEditado);
       this.ejercicios = this.ejercicioService.getEjercicios();
@@ -69,25 +68,13 @@ export class AppComponent implements OnInit{
   aniadirEjercicio(): void {
     let ref = this.modalService.open(FormularioEjercicioComponent);
     ref.componentInstance.accion = "Añadir";
-    ref.componentInstance.ejercicio = {id: 0, nombre: '', descripcion: '', observaciones: '', tipo: '', musculosTrabajados: '', material: '',  dificultad: '', multimedia: [] };;
+    ref.componentInstance.ejercicio = {id: 0, nombre: '', descripcion: '', observaciones: '', tipo: '', musculosTrabajados: '', material: '',  dificultad: '', multimedia: [] };
     ref.result.then((ejercicio: Ejercicio) => {
       this.ejercicioService.addEjercicio(ejercicio);
       this.ejercicios = this.ejercicioService.getEjercicios();
     }, (reason) => {});
   }
-  /*
-  aniadirRutina(): void {
-    let ref = this.modalService.open(FormularioRutinaComponent);
-    ref.componentInstance.accion = "Añadir";
-    ref.componentInstance.rutina = { id: 0, nombre: '', observaciones:'', descripcion:'', ejercicios: []};
-    ref.result.then((rutina: Rutina) => {
-      this.rutinaService.addRutina(rutina);
-      this.rutinas = this.rutinaService.getRutinas();
-    }, (reason) => {});
-
-  }
-  }
-*/
+  
 
   eliminarRutina(rutina: Rutina): void {
     this.rutinaService.eliminarRutina(rutina.id);

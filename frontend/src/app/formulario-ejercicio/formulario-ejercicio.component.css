@@ -1,0 +1,11 @@
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .exercise-item {
+    display: flex; /* Use Flexbox for layout */
+    align-items: center; /* Align items vertically */
+    justify-content: space-between; /* Space items evenly */
+    margin-bottom: 10px; /* Add margin at the bottom of each exercise item */
+  }

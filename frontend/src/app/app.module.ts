@@ -4,10 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormularioRutinaComponent } from './formulario-rutina/formulario-rutina.component';
+import { FormularioEjercicioComponent } from './formulario-ejercicio/formulario-ejercicio.component';
 
 @NgModule({
   declarations: [
-    FormularioRutinaComponent
+    FormularioRutinaComponent,
+    FormularioEjercicioComponent
   ],
   imports: [
     BrowserModule,
