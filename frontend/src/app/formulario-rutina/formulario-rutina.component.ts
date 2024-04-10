@@ -12,6 +12,7 @@ import { EjercicioService } from '../ejercicio.service';
   styleUrls: ['./formulario-rutina.component.css']
 })
 export class FormularioRutinaComponent {
+  
   accion?: "Añadir" | "Editar";
   ejerciciosSeleccionados: Ejs[] = []; 
   ejer: Ejs = { ejercicio: {id: 0, nombre:'', descripcion:'', observaciones: '', tipo: '', musculosTrabajados:'', material: '', dificultad:'', multimedia: []}, series: 0, repeticiones: 0, duracionMinutos: 0};

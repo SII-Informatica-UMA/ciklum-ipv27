@@ -14,7 +14,7 @@ import { FormularioEjercicioComponent } from './formulario-ejercicio/formulario-
   imports: [
     BrowserModule,
     NgbModule,
-    FormsModule
+    FormsModule,
   ],
   providers: [],
   bootstrap:[AppComponent]

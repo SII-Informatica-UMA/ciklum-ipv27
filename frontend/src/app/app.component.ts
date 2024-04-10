@@ -17,7 +17,7 @@ import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
   standalone: true,
   imports: [NgbNavModule, NgFor,NgbAccordionModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 
 
@@ -37,6 +37,8 @@ export class AppComponent implements OnInit{
     this.rutinas = this.rutinaService.getRutinas();
     this.ejercicioElegido = this.ejercicios[0];
     this.rutinaElegido = this.rutinas[0];
+    this.ordenarEjercicios();
+    this.ordenarRutinas();
   }
 
   elegirEjercicio(ejercicio: Ejercicio): void {
@@ -62,6 +64,7 @@ export class AppComponent implements OnInit{
     ref.result.then((ejercicioEditado: Ejercicio) => {
       this.ejercicioService.editarEjercicio(ejercicioEditado);
       this.ejercicios = this.ejercicioService.getEjercicios();
+      this.ordenarEjercicios();
     }, (reason) => {});
   }
 
@@ -72,6 +75,7 @@ export class AppComponent implements OnInit{
     ref.result.then((ejercicio: Ejercicio) => {
       this.ejercicioService.addEjercicio(ejercicio);
       this.ejercicios = this.ejercicioService.getEjercicios();
+      this.ordenarEjercicios();
     }, (reason) => {});
   }
   
@@ -89,6 +93,7 @@ export class AppComponent implements OnInit{
     ref.result.then((rutina: Rutina) => {
       this.rutinaService.addRutina(rutina);
       this.rutinas = this.rutinaService.getRutinas();
+      this.ordenarRutinas();
     }, (reason) => {});
 
   }
@@ -101,12 +106,33 @@ export class AppComponent implements OnInit{
     ref.result.then((rutinaEditada: Rutina) => {
       this.rutinaService.editarRutina(rutinaEditada);
       this.rutinas = this.rutinaService.getRutinas();
+      this.ordenarRutinas();
     }, (reason) => {});
   }
 
   getSafeUrl(url: string): SafeResourceUrl {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
 
+  }
+
+  ordenarEjercicios(){
+    this.ejercicios.sort(this.ordenar1);
+  }
+
+  ordenar1(ejercicio1: Ejercicio, ejercicio2: Ejercicio):number{
+      if(ejercicio1.nombre < ejercicio2.nombre) return -1;
+      if(ejercicio1.nombre > ejercicio2.nombre) return 1;
+      return 0;
+  }
+
+  ordenarRutinas(){
+    this.rutinas.sort(this.ordenar2);
+  }
+
+  ordenar2(rutina1: Rutina, rutina2: Rutina):number{
+      if(rutina1.nombre < rutina2.nombre) return -1;
+      if(rutina1.nombre > rutina2.nombre) return 1;
+      return 0;
   }
 
 
