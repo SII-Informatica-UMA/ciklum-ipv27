@@ -10,6 +10,9 @@
 	<li [ngbNavItem]="1">
 		<button ngbNavLink>Ejercicios</button>
 		<ng-template ngbNavContent>
+			<ngb-alert *ngIf="showAlert" #alert class="alert alert-warning" (closed)="closeAlert()">  El ejercicio está siendo utilizado en alguna rutina y no puede ser eliminado.
+			</ngb-alert>
+
 			<div class="d-flex">
 				<div ngbNav #nav="ngbNav" class="nav-pills flex-column" orientation="vertical">
 					<ng-container *ngFor="let ejercicio of ejercicios" ngbNavItem>

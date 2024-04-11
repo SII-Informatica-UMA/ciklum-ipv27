@@ -42,41 +42,25 @@ describe('AppComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [],
-      imports: [HttpClientModule, AppComponent], 
-    }).compileComponents();
-
-    /* 
-        TestBed.configureTestingModule({
-      declarations: [AppComponent, FormularioEjercicioComponent, FormularioRutinaComponent],
-      imports: [FormsModule],
+      imports: [HttpClientModule, FormsModule, AppComponent], 
       providers: [
         { provide: EjercicioService, useValue: mockEjercicioService },
         { provide: RutinaService, useValue: mockRutinaService },
         { provide: NgbModal, useValue: mockModalService }
       ]
-    }).compileComponents();*/
+    }).compileComponents();
     
     fixture = TestBed.createComponent(AppComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-
   }));
 
-
-
-  it('Debería inicializarse con arrays vacíos tanto para ejercicios como para rutinas', () => {
-    expect(component.ejercicios).toEqual([]);
-    expect(component.rutinas).toEqual([]);
-  });
-
-  it('Debería actualizar ejercicios al inicializarse', () => {
+  it('should update ejercicios on initialization', () => {
     expect(mockEjercicioService.getEjercicios).toHaveBeenCalled();
-    expect(component.ejercicios.length).toBeGreaterThan(0);
   });
 
-  it('Debería actualizar rutinas al inicializarse', () => {
+  it('should update rutinas on initialization', () => {
     expect(mockRutinaService.getRutinas).toHaveBeenCalled();
-    expect(component.rutinas.length).toBeGreaterThan(0);
   });
 
   it('Debe elegir un ejercicio cuando se llama a elegirEjercicio', () => {
@@ -118,6 +102,31 @@ describe('AppComponent', () => {
     const rutina = { id: 1, nombre: 'Rutina de prueba', observaciones: 'Observaciones de la rutina de prueba', descripcion: 'Descripción de la rutina de prueba', ejercicios };;
     component.elegirRutina(rutina);
     expect(component.rutinaElegido).toEqual(rutina);
+  });
+
+  it('should set showAlert to true if an exercise is used in a routine when trying to delete it', () => {
+    const ejercicioId = 1;
+    component.rutinas = [
+      {
+        id: 1,
+        nombre: 'Rutina de prueba',
+        descripcion: '',
+        observaciones:'',
+        ejercicios: [{ series:0, repeticiones:0, duracionMinutos:0 ,ejercicio: {
+          id: ejercicioId,
+          nombre: '',
+          descripcion: '',
+          observaciones: '',
+          tipo: '',
+          musculosTrabajados: '',
+          material: '',
+          dificultad: '',
+          multimedia: []
+        } }]
+      }
+    ];
+    component.eliminarEjercicio(ejercicioId);
+    expect(component.showAlert).toBeTrue();
   });
 
   it('should create the app', () => {

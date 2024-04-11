@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import {Ejercicio } from './ejercicio';
 import {Rutina } from './rutina';
 import {RutinaService} from './rutina.service';
@@ -8,24 +8,30 @@ import {FormularioEjercicioComponent} from './formulario-ejercicio/formulario-ej
 import { NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import { NgFor } from '@angular/common';
+import { NgIf } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
+
 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [NgbNavModule, NgFor,NgbAccordionModule],
+  imports: [NgbNavModule, NgFor,NgbAccordionModule,NgIf,NgbAlertModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 
 
 export class AppComponent implements OnInit{
+  showAlert = false;
   ejercicios: Ejercicio [] = [];
   rutinas: Rutina [] = [];
   ejercicioElegido?: Ejercicio;
   rutinaElegido?: Rutina;
+
+  @ViewChild('alert') alert?: NgbAlertModule;
   
 
   constructor(private ejercicioService: EjercicioService, private rutinaService: RutinaService,private sanitizer: DomSanitizer,private modalService: NgbModal) { }
@@ -65,18 +71,23 @@ export class AppComponent implements OnInit{
         if(id){
           this.ejercicioElegido = this.ejercicios.find(c => c.id==id);
         }
-        this.ejercicios = [...this.ejercicios];
       });
   }
 
   eliminarEjercicio(id:number): void {
-    this.ejercicioService.eliminarEjercicio(id)
-      .subscribe(r => {
-        this.actualizaEjercicios();
-      })
-    this.ejercicioElegido = undefined;
-  }
+    const isUsedInRutina = this.rutinas.some(rutina => rutina.ejercicios.some(ejercicio => ejercicio.ejercicio.id == id));
 
+    if (isUsedInRutina) {
+      this.showAlert = true; 
+    } else {
+      this.ejercicioService.eliminarEjercicio(id)
+        .subscribe(() => {
+          this.actualizaEjercicios();
+        });
+        this.ejercicioElegido=undefined;
+    }
+  }
+   
   
   editarEjercicio(ejercicio: Ejercicio): void {
     let ref = this.modalService.open(FormularioEjercicioComponent);
@@ -143,6 +154,10 @@ export class AppComponent implements OnInit{
   getSafeUrl(url: string): SafeResourceUrl {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
 
+  }
+
+  closeAlert(): void {
+    this.showAlert = false;  
   }
 
   /*

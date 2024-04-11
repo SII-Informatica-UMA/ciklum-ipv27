@@ -6,6 +6,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormularioRutinaComponent } from './formulario-rutina/formulario-rutina.component';
 import { FormularioEjercicioComponent } from './formulario-ejercicio/formulario-ejercicio.component';
 import { HttpClientModule } from '@angular/common/http';
+import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
+
 
 
 @NgModule({
@@ -17,7 +19,8 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserModule,
     NgbModule,
     FormsModule,
-    HttpClientModule
+    HttpClientModule,
+    NgbAlertModule
   ],
   providers: [],
   bootstrap:[AppComponent]
