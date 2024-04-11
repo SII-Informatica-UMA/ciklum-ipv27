@@ -37,8 +37,7 @@ export class AppComponent implements OnInit{
     this.actualizaRutinas();
     this.ejercicioElegido = this.ejercicios[0];
     this.rutinaElegido = this.rutinas[0];
-    this.ordenarEjercicios();
-    this.ordenarRutinas();
+    
   }
 
   elegirEjercicio(ejercicio: Ejercicio): void {
@@ -57,7 +56,6 @@ export class AppComponent implements OnInit{
           this.rutinaElegido = this.rutinas.find(c => c.id==id);
         }
       })
-      this.ordenarRutinas;
   }
 
   private actualizaEjercicios(id?: number): void {
@@ -67,8 +65,8 @@ export class AppComponent implements OnInit{
         if(id){
           this.ejercicioElegido = this.ejercicios.find(c => c.id==id);
         }
-      })
-      this.ordenarEjercicios;
+        this.ejercicios = [...this.ejercicios];
+      });
   }
 
   eliminarEjercicio(id:number): void {
@@ -91,6 +89,7 @@ export class AppComponent implements OnInit{
         this.actualizaEjercicios(ejercicio.id);
       })
     }, (reason) => {});
+   
   }
 
   aniadirEjercicio(): void {
@@ -103,6 +102,8 @@ export class AppComponent implements OnInit{
           this.actualizaEjercicios();
         })
     }, (reason) => {});
+   
+
   }
   
   eliminarRutina(id: number): void {
@@ -144,8 +145,9 @@ export class AppComponent implements OnInit{
 
   }
 
-  ordenarEjercicios(){
-    this.ejercicios.sort(this.ordenar1);
+  /*
+  ordenarEjercicios(): void {
+    this.ejercicios.sort((a, b) => a.nombre.localeCompare(b.nombre));
   }
 
   ordenar1(ejercicio1: Ejercicio, ejercicio2: Ejercicio):number{
@@ -163,6 +165,8 @@ export class AppComponent implements OnInit{
       if(rutina1.nombre > rutina2.nombre) return 1;
       return 0;
   }
+
+  */
 
 
 }

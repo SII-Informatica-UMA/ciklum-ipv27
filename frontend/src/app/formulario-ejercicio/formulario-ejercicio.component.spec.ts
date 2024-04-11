@@ -122,6 +122,7 @@ describe('FormularioEjercicioComponent', () => {
   it('debe agregar un enlace multimedia a multimediaSeleccionados y ejercicio.multimedia', () => {
     component.enlaceMultimedia = 'https://example.com/image.jpg';
     component.agregarMultimedia();
+    component.guardarEjercicio();
     expect(component.multimediaSeleccionados.length).toBe(1);
     expect(component.ejercicio.multimedia.length).toBe(1);
     expect(component.multimediaSeleccionados[0]).toBe('https://example.com/image.jpg');
@@ -132,6 +133,7 @@ describe('FormularioEjercicioComponent', () => {
     component.multimediaSeleccionados = ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'];
     component.ejercicio.multimedia = ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'];
     component.eliminarMultimedia(0);
+    component.guardarEjercicio();
     expect(component.multimediaSeleccionados.length).toBe(1);
     expect(component.ejercicio.multimedia.length).toBe(1);
     expect(component.multimediaSeleccionados[0]).toBe('https://example.com/image2.jpg');
@@ -150,6 +152,7 @@ describe('FormularioEjercicioComponent', () => {
     component.agregarMultimedia();
     component.enlaceMultimedia = 'https://example.com/image2.jpg';
     component.agregarMultimedia();
+    component.guardarEjercicio();
     expect(component.multimediaSeleccionados.length).toBe(2);
     expect(component.ejercicio.multimedia.length).toBe(2);
     expect(component.multimediaSeleccionados).toEqual(['https://example.com/image1.jpg', 'https://example.com/image2.jpg']);
@@ -160,6 +163,7 @@ describe('FormularioEjercicioComponent', () => {
     component.multimediaSeleccionados = ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'];
     component.ejercicio.multimedia = ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'];
     component.eliminarMultimedia(0);
+    component.guardarEjercicio();
     expect(component.multimediaSeleccionados.length).toBe(1);
     expect(component.ejercicio.multimedia.length).toBe(1);
     expect(component.multimediaSeleccionados).toEqual(['https://example.com/image2.jpg']);

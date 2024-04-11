@@ -4,6 +4,8 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import {EjercicioService} from '../ejercicio.service';
 import {Rutina} from '../rutina'
+import { of } from 'rxjs';
+
 
 describe('FormularioRutinaComponent', () => {
   let component: FormularioRutinaComponent;
@@ -17,10 +19,12 @@ describe('FormularioRutinaComponent', () => {
     };
 
     mockEjercicioService = {
-      getEjercicios: jasmine.createSpy('getEjercicios').and.returnValue([
-        { id: 1, nombre: 'Ejercicio 1', descripcion: 'Descripción 1', observaciones: 'Observaciones 1', tipo: 'Tipo 1', musculosTrabajados: 'Músculos 1', material: 'Material 1', dificultad: 'Fácil', multimedia: [] },
-        { id: 2, nombre: 'Ejercicio 2', descripcion: 'Descripción 2', observaciones: 'Observaciones 2',tipo: 'Tipo 2', musculosTrabajados: 'Músculos 2', material: 'Material 2', dificultad: 'Moderado', multimedia: [] }
-      ])
+      getEjercicios: jasmine.createSpy('getEjercicios').and.returnValue(
+        of([
+          { id: 1, nombre: 'Ejercicio 1', descripcion: 'Descripción 1', observaciones: 'Observaciones 1', tipo: 'Tipo 1', musculosTrabajados: 'Músculos 1', material: 'Material 1', dificultad: 'Fácil', multimedia: [] },
+          { id: 2, nombre: 'Ejercicio 2', descripcion: 'Descripción 2', observaciones: 'Observaciones 2',tipo: 'Tipo 2', musculosTrabajados: 'Músculos 2', material: 'Material 2', dificultad: 'Moderado', multimedia: [] }
+        ])
+      )
     };
 
     TestBed.configureTestingModule({
