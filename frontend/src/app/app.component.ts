@@ -17,7 +17,7 @@ import { NgbAccordionModule } from '@ng-bootstrap/ng-bootstrap';
   standalone: true,
   imports: [NgbNavModule, NgFor,NgbAccordionModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 
 
@@ -33,12 +33,12 @@ export class AppComponent implements OnInit{
  
 
   ngOnInit(): void {
-    //this.ejercicios = this.ejercicioService.getEjercicios();
-    //this.rutinas = this.rutinaService.getRutinas();
     this.actualizaEjercicios();
     this.actualizaRutinas();
     this.ejercicioElegido = this.ejercicios[0];
     this.rutinaElegido = this.rutinas[0];
+    this.ordenarEjercicios();
+    this.ordenarRutinas();
   }
 
   elegirEjercicio(ejercicio: Ejercicio): void {
@@ -57,6 +57,7 @@ export class AppComponent implements OnInit{
           this.rutinaElegido = this.rutinas.find(c => c.id==id);
         }
       })
+      this.ordenarRutinas;
   }
 
   private actualizaEjercicios(id?: number): void {
@@ -67,15 +68,14 @@ export class AppComponent implements OnInit{
           this.ejercicioElegido = this.ejercicios.find(c => c.id==id);
         }
       })
+      this.ordenarEjercicios;
   }
 
-  //antes ejercicio:Ejercicio
   eliminarEjercicio(id:number): void {
     this.ejercicioService.eliminarEjercicio(id)
       .subscribe(r => {
         this.actualizaEjercicios();
       })
-    //this.ejercicios = this.ejercicioService.getEjercicios();
     this.ejercicioElegido = undefined;
   }
 
@@ -90,7 +90,6 @@ export class AppComponent implements OnInit{
       .subscribe(c => {
         this.actualizaEjercicios(ejercicio.id);
       })
-      //this.ejercicios = this.ejercicioService.getEjercicios();
     }, (reason) => {});
   }
 
@@ -103,17 +102,14 @@ export class AppComponent implements OnInit{
         .subscribe(c => {
           this.actualizaEjercicios();
         })
-      //this.ejercicios = this.ejercicioService.getEjercicios();
     }, (reason) => {});
   }
   
-  //antes rutina:Rutina
   eliminarRutina(id: number): void {
     this.rutinaService.eliminarRutina(id)
       .subscribe(r => {
         this.actualizaRutinas();
       });
-    //this.rutinas = this.rutinaService.getRutinas();
     this.rutinaElegido = undefined;
   }
 
@@ -126,7 +122,6 @@ export class AppComponent implements OnInit{
         .subscribe(c => {
             this.actualizaRutinas();
         })
-      //this.rutinas = this.rutinaService.getRutinas();
     }, (reason) => {});
 
   }
@@ -141,13 +136,32 @@ export class AppComponent implements OnInit{
         .subscribe(c => {
           this.actualizaRutinas(rutina.id);
         })
-      //this.rutinas = this.rutinaService.getRutinas();
     }, (reason) => {});
   }
 
   getSafeUrl(url: string): SafeResourceUrl {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
 
+  }
+
+  ordenarEjercicios(){
+    this.ejercicios.sort(this.ordenar1);
+  }
+
+  ordenar1(ejercicio1: Ejercicio, ejercicio2: Ejercicio):number{
+      if(ejercicio1.nombre < ejercicio2.nombre) return -1;
+      if(ejercicio1.nombre > ejercicio2.nombre) return 1;
+      return 0;
+  }
+
+  ordenarRutinas(){
+    this.rutinas.sort(this.ordenar2);
+  }
+
+  ordenar2(rutina1: Rutina, rutina2: Rutina):number{
+      if(rutina1.nombre < rutina2.nombre) return -1;
+      if(rutina1.nombre > rutina2.nombre) return 1;
+      return 0;
   }
 
 
