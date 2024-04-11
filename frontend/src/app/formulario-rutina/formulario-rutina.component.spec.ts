@@ -3,6 +3,7 @@ import { FormularioRutinaComponent } from './formulario-rutina.component';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import {EjercicioService} from '../ejercicio.service';
+import {Rutina} from '../rutina'
 
 describe('FormularioRutinaComponent', () => {
   let component: FormularioRutinaComponent;
@@ -45,6 +46,104 @@ describe('FormularioRutinaComponent', () => {
     expect(component.ejerciciosSeleccionados).toEqual([]);
     expect(component.ejer).toEqual({ ejercicio: { id: 0, nombre: '', descripcion: '', observaciones: '', tipo: '', musculosTrabajados: '', material: '', dificultad: '', multimedia: [] }, series: 0, repeticiones: 0, duracionMinutos: 0 });
     expect(component.rutina).toEqual({ id: 0, nombre: '', observaciones: '', descripcion: '', ejercicios: [] });
+  });
+
+  it('debe mostrar tres botones al iniciar el formulario de añadir', () => {
+    const buttons = fixture.nativeElement.querySelectorAll('button');
+    expect(buttons.length).toBe(3);
+  });
+
+  it('debe mostrar un botón por cada ejercicio que tiene una rutina al editarla', () => {
+    const numEjercicios = 3;
+    const ejercicios = Array.from({ length: numEjercicios }, (_, i) => ({
+      series: i + 1,
+      repeticiones: i + 10,
+      duracionMinutos: i + 20,
+      ejercicio: {
+        id: i + 1,
+        nombre: `Ejercicio ${i + 1}`,
+        descripcion: `Descripción del ejercicio ${i + 1}`,
+        observaciones: `Observaciones del ejercicio ${i + 1}`,
+        tipo: `Tipo ${i + 1}`,
+        musculosTrabajados: `Músculos del ejercicio ${i + 1}`,
+        material: `Material del ejercicio ${i + 1}`,
+        dificultad: 'Fácil',
+        multimedia: []
+      }
+    }));
+    const rutina = { id: 1, nombre: 'Rutina de prueba', observaciones: 'Observaciones de la rutina de prueba', descripcion: 'Descripción de la rutina de prueba', ejercicios };
+    component.rutina = rutina;
+    const buttons = fixture.nativeElement.querySelectorAll('button');
+    expect(buttons.length).toBe(numEjercicios );
+  });
+
+  it('debe mostrar un botón adicional al agregar un ejercicio al editar una rutina', () => {
+    const numEjercicios = 3;
+    const ejercicios = Array.from({ length: numEjercicios }, (_, i) => ({
+      series: i + 1,
+      repeticiones: i + 10,
+      duracionMinutos: i + 20,
+      ejercicio: {
+        id: i + 1,
+        nombre: `Ejercicio ${i + 1}`,
+        descripcion: `Descripción del ejercicio ${i + 1}`,
+        observaciones: `Observaciones del ejercicio ${i + 1}`,
+        tipo: `Tipo ${i + 1}`,
+        musculosTrabajados: `Músculos del ejercicio ${i + 1}`,
+        material: `Material del ejercicio ${i + 1}`,
+        dificultad: 'Fácil',
+        multimedia: []
+      }
+    }));
+    const rutina = { id: 1, nombre: 'Rutina de prueba', observaciones: 'Observaciones de la rutina de prueba', descripcion: 'Descripción de la rutina de prueba', ejercicios };
+    component.rutina = rutina;
+    fixture.detectChanges();
+    const buttonsBefore = fixture.nativeElement.querySelectorAll('button').length;
+    component.ejer = {
+      ejercicio: { id: 0, nombre: '', descripcion: '', observaciones: '', tipo: '', musculosTrabajados: '', material: '', dificultad: '', multimedia: [] },
+      series: 0,
+      repeticiones: 0,
+      duracionMinutos: 0
+    };
+    component.ejerciciosSeleccionados.push(component.ejer);
+    component.agregarEjercicio();
+    fixture.detectChanges();
+    const buttonsAfter = fixture.nativeElement.querySelectorAll('button').length;
+    expect(buttonsAfter).toBe(buttonsBefore + 1);
+  });
+  
+
+
+  it('debe eliminar un ejercicio del formulario y mostrar un botón menos', () => {
+    component.ejerciciosSeleccionados = [{ ejercicio: { id: 1, nombre: 'Ejercicio 1', descripcion: 'Descripción 1', observaciones: 'Observaciones 1', tipo: 'Tipo 1', musculosTrabajados: 'Músculos 1', material: 'Material 1', dificultad: 'Fácil', multimedia: [] }, series: 3, repeticiones: 10, duracionMinutos: 20 }];
+    const numEjerciciosBefore = component.ejerciciosSeleccionados.length;
+
+    component.eliminarEjercicio(0);
+
+    expect(component.ejerciciosSeleccionados.length).toBe(numEjerciciosBefore - 1);
+
+    const buttons = fixture.nativeElement.querySelectorAll('button');
+    const addButton = buttons[buttons.length - 1];
+    expect(addButton.textContent.trim()).toBe('Guardar');
+  });
+
+ 
+  
+
+  it('debe agregar correctamente una rutina al cerrar el modal', () => {
+    component.rutina = { id: 1, nombre: 'Rutina de prueba', observaciones: 'Esta es una rutina de prueba', descripcion: 'Descripción de la rutina de prueba', ejercicios: [] };
+    component.guardarRutina();
+    expect(mockModal.close).toHaveBeenCalledWith(component.rutina);
+  });
+
+  it('debe editar correctamente una rutina al cerrar el modal', () => {
+    const rutinaExistente: Rutina = { id: 1, nombre: 'Rutina existente', observaciones: 'Esta es una rutina existente', descripcion: 'Descripción de la rutina existente', ejercicios: [] };
+    component.rutina = rutinaExistente;
+    const nuevaDescripcion = 'Nueva descripción de la rutina';
+    component.rutina.descripcion = nuevaDescripcion;
+    component.guardarRutina();
+    expect(mockModal.close).toHaveBeenCalledWith(component.rutina);
+    
   });
 
   it('debe agregar el ejercicio seleccionado a ejerciciosSeleccionados', () => {

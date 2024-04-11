@@ -38,6 +38,87 @@ describe('FormularioEjercicioComponent', () => {
     expect(component.enlaceMultimedia).toBe('');
   });
 
+  it('debe mostrar tres botones al iniciar el formulario de añadir', () => {
+    const buttons = fixture.nativeElement.querySelectorAll('button');
+    expect(buttons.length).toBe(3);
+  });
+
+  it('debe mostrar un botón por cada enlace multimedia al editar un ejercicio', () => {
+    const numMultimedia = 3;
+    const ejercicio = {
+      id: 1,
+      nombre: 'Ejercicio de prueba',
+      descripcion: 'Este es un ejercicio de prueba',
+      observaciones: 'Observaciones del ejercicio de prueba',
+      tipo: 'Tipo de prueba',
+      musculosTrabajados: 'Músculos de prueba',
+      material: 'Material de prueba',
+      dificultad: 'Fácil',
+      multimedia: Array.from({ length: numMultimedia }, (_, i) => `https://example.com/image${i + 1}.jpg`)
+    };
+    component.ejercicio = ejercicio;
+    fixture.detectChanges();
+    const buttons = fixture.nativeElement.querySelectorAll('button');
+    expect(buttons.length).toBe(numMultimedia);
+  });
+
+  it('debe mostrar un botón adicional al agregar un enlace multimedia al editar un ejercicio', () => {
+    const numMultimedia = 3;
+    const ejercicio = {
+      id: 1,
+      nombre: 'Ejercicio de prueba',
+      descripcion: 'Este es un ejercicio de prueba',
+      observaciones: 'Observaciones del ejercicio de prueba',
+      tipo: 'Tipo de prueba',
+      musculosTrabajados: 'Músculos de prueba',
+      material: 'Material de prueba',
+      dificultad: 'Fácil',
+      multimedia: Array.from({ length: numMultimedia }, (_, i) => `https://example.com/image${i + 1}.jpg`)
+    };
+  
+    component.ejercicio = ejercicio;
+    fixture.detectChanges();
+    const buttonsBefore = fixture.nativeElement.querySelectorAll('button').length;
+    component.enlaceMultimedia = 'https://example.com/image4.jpg';
+    component.agregarMultimedia();
+    fixture.detectChanges();
+    const buttonsAfter = fixture.nativeElement.querySelectorAll('button').length;
+    expect(buttonsAfter).toBe(buttonsBefore + 1);
+  });
+
+  it('debe eliminar un enlace multimedia del formulario y mostrar un botón menos', () => {
+    component.multimediaSeleccionados = ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'];
+    component.ejercicio.multimedia = ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'];
+
+    const numEjerciciosBefore = component.multimediaSeleccionados.length;
+
+    component.eliminarMultimedia(0);
+
+    expect(component.multimediaSeleccionados.length).toBe(numEjerciciosBefore - 1);
+
+    const buttons = fixture.nativeElement.querySelectorAll('button');
+    const addButton = buttons[buttons.length - 1];
+    expect(addButton.textContent.trim()).toBe('Guardar');
+  });
+  
+  
+
+  it('debe añadir correctamente un ejercicio al cerrar el modal', () => {
+    const ejercicio = { id: 1, nombre: 'Ejercicio de prueba', descripcion: 'Este es un ejercicio de prueba', observaciones: 'Observaciones del ejercicio de prueba', tipo: 'Tipo de prueba', musculosTrabajados: 'Músculos de prueba', material: 'Material de prueba', dificultad: 'Fácil', multimedia: ['https://example.com/image.jpg'] };
+    component.ejercicio = ejercicio;
+    component.guardarEjercicio();
+    expect(mockModal.close).toHaveBeenCalledWith(ejercicio);
+  });
+
+  it('debe editar correctamente un ejercicio al cerrar el modal', () => {
+    const ejercicioExistente = { id: 1, nombre: 'Ejercicio existente', descripcion: 'Descripción del ejercicio existente', observaciones: 'Observaciones del ejercicio existente', tipo: 'Tipo existente', musculosTrabajados: 'Músculos del ejercicio existente', material: 'Material del ejercicio existente', dificultad: 'Fácil', multimedia: ['https://example.com/image.jpg'] };
+    component.ejercicio = ejercicioExistente;
+    const nuevaDescripcion = 'Nueva descripción del ejercicio';
+    component.ejercicio.descripcion = nuevaDescripcion;
+    component.guardarEjercicio();
+    expect(mockModal.close).toHaveBeenCalledWith(component.ejercicio);
+  });
+
   it('debe agregar un enlace multimedia a multimediaSeleccionados y ejercicio.multimedia', () => {
     component.enlaceMultimedia = 'https://example.com/image.jpg';
     component.agregarMultimedia();
