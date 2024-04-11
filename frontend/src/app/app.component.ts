@@ -33,8 +33,10 @@ export class AppComponent implements OnInit{
  
 
   ngOnInit(): void {
-    this.ejercicios = this.ejercicioService.getEjercicios();
-    this.rutinas = this.rutinaService.getRutinas();
+    //this.ejercicios = this.ejercicioService.getEjercicios();
+    //this.rutinas = this.rutinaService.getRutinas();
+    this.actualizaEjercicios();
+    this.actualizaRutinas();
     this.ejercicioElegido = this.ejercicios[0];
     this.rutinaElegido = this.rutinas[0];
   }
@@ -47,9 +49,33 @@ export class AppComponent implements OnInit{
     this.rutinaElegido = rutina;
   }
 
-  eliminarEjercicio(ejercicio: Ejercicio): void {
-    this.ejercicioService.eliminarEjercicio(ejercicio.id);
-    this.ejercicios = this.ejercicioService.getEjercicios();
+  private actualizaRutinas(id?: number): void {
+    this.rutinaService.getRutinas()
+      .subscribe(rutinas => {
+        this.rutinas = rutinas;
+        if(id){
+          this.rutinaElegido = this.rutinas.find(c => c.id==id);
+        }
+      })
+  }
+
+  private actualizaEjercicios(id?: number): void {
+    this.ejercicioService.getEjercicios()
+      .subscribe(ejercicios => {
+        this.ejercicios = ejercicios;
+        if(id){
+          this.ejercicioElegido = this.ejercicios.find(c => c.id==id);
+        }
+      })
+  }
+
+  //antes ejercicio:Ejercicio
+  eliminarEjercicio(id:number): void {
+    this.ejercicioService.eliminarEjercicio(id)
+      .subscribe(r => {
+        this.actualizaEjercicios();
+      })
+    //this.ejercicios = this.ejercicioService.getEjercicios();
     this.ejercicioElegido = undefined;
   }
 
@@ -60,8 +86,11 @@ export class AppComponent implements OnInit{
     ref.componentInstance.ejercicio = {...ejercicio};
     ref.componentInstance.multimediaSeleccionados = [...ejercicio.multimedia];
     ref.result.then((ejercicioEditado: Ejercicio) => {
-      this.ejercicioService.editarEjercicio(ejercicioEditado);
-      this.ejercicios = this.ejercicioService.getEjercicios();
+      this.ejercicioService.editarEjercicio(ejercicioEditado)
+      .subscribe(c => {
+        this.actualizaEjercicios(ejercicio.id);
+      })
+      //this.ejercicios = this.ejercicioService.getEjercicios();
     }, (reason) => {});
   }
 
@@ -70,15 +99,21 @@ export class AppComponent implements OnInit{
     ref.componentInstance.accion = "Añadir";
     ref.componentInstance.ejercicio = {id: 0, nombre: '', descripcion: '', observaciones: '', tipo: '', musculosTrabajados: '', material: '',  dificultad: '', multimedia: [] };
     ref.result.then((ejercicio: Ejercicio) => {
-      this.ejercicioService.addEjercicio(ejercicio);
-      this.ejercicios = this.ejercicioService.getEjercicios();
+      this.ejercicioService.addEjercicio(ejercicio)
+        .subscribe(c => {
+          this.actualizaEjercicios();
+        })
+      //this.ejercicios = this.ejercicioService.getEjercicios();
     }, (reason) => {});
   }
   
-
-  eliminarRutina(rutina: Rutina): void {
-    this.rutinaService.eliminarRutina(rutina.id);
-    this.rutinas = this.rutinaService.getRutinas();
+  //antes rutina:Rutina
+  eliminarRutina(id: number): void {
+    this.rutinaService.eliminarRutina(id)
+      .subscribe(r => {
+        this.actualizaRutinas();
+      });
+    //this.rutinas = this.rutinaService.getRutinas();
     this.rutinaElegido = undefined;
   }
 
@@ -87,8 +122,11 @@ export class AppComponent implements OnInit{
     ref.componentInstance.accion = "Añadir";
     ref.componentInstance.rutina = { id: 0, nombre: '', observaciones:'', descripcion:'', ejercicios: []};
     ref.result.then((rutina: Rutina) => {
-      this.rutinaService.addRutina(rutina);
-      this.rutinas = this.rutinaService.getRutinas();
+      this.rutinaService.addRutina(rutina)
+        .subscribe(c => {
+            this.actualizaRutinas();
+        })
+      //this.rutinas = this.rutinaService.getRutinas();
     }, (reason) => {});
 
   }
@@ -99,8 +137,11 @@ export class AppComponent implements OnInit{
     ref.componentInstance.rutina = {...rutina};
     ref.componentInstance.ejerciciosSeleccionados = [...rutina.ejercicios];
     ref.result.then((rutinaEditada: Rutina) => {
-      this.rutinaService.editarRutina(rutinaEditada);
-      this.rutinas = this.rutinaService.getRutinas();
+      this.rutinaService.editarRutina(rutinaEditada)
+        .subscribe(c => {
+          this.actualizaRutinas(rutina.id);
+        })
+      //this.rutinas = this.rutinaService.getRutinas();
     }, (reason) => {});
   }
 

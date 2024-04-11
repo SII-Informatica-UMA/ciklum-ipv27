@@ -5,6 +5,8 @@ import { AppComponent } from './app.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormularioRutinaComponent } from './formulario-rutina/formulario-rutina.component';
 import { FormularioEjercicioComponent } from './formulario-ejercicio/formulario-ejercicio.component';
+import { HttpClientModule } from '@angular/common/http';
+
 
 @NgModule({
   declarations: [
@@ -14,7 +16,8 @@ import { FormularioEjercicioComponent } from './formulario-ejercicio/formulario-
   imports: [
     BrowserModule,
     NgbModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ],
   providers: [],
   bootstrap:[AppComponent]

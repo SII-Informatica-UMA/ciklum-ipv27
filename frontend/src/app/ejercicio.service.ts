@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import {Ejercicio } from './ejercicio';
+import {HttpClient, HttpResponse} from '@angular/common/http';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EjercicioService {
+/*export class EjercicioService {
   private ejercicios: Ejercicio [] = [
     {id: 1, nombre: 'Flexiones', descripcion: 'Este ejercicio consiste en levantar y bajar el cuerpo mediante el apoyo de las manos y los pies, manteniendo la espalda recta y los músculos del abdomen contraídos.', observaciones:'Ejercicio muy útil y sencillo de realizar que puede dar resultados en poco tiempo',tipo:'Pecho',musculosTrabajados:'Pectorales y tríceps', material:'Esterilla',dificultad:'Fácil', multimedia: ['https://www.youtube.com/embed/e_EKkqoHxns?si=DbPdTLHWluuHaism', 'Imagen flexiones']},
     {id: 2, nombre: 'Abdominales', descripcion: 'Eleva el torso hacia las rodillas sin levantar la espalda completamente del suelo ni levantar los pies. Ejerce fuerza en los abdominales, evitando forzar otros músculos', observaciones:'',tipo:'',musculosTrabajados:'', material:'',dificultad:'', multimedia: ['https://www.youtube.com/embed/mMieHCr-H0c?si=iw8Fzfja0xFgJ1JQ','Imagen abdominales']},
@@ -32,5 +34,28 @@ export class EjercicioService {
   eliminarEjercicio(id: number) {
     let indice = this.ejercicios.findIndex(c => c.id == id);
     this.ejercicios.splice(indice, 1);
+  }
+} */
+
+export class EjercicioService {
+  private baseURI: string = 'http://localhost:8080/ejercicio';
+
+  constructor(private http: HttpClient) { }
+
+  getEjercicios(): Observable<Ejercicio []> {
+    return this.http.get<Ejercicio []>(this.baseURI+'?entrenador=1');
+  }
+
+  addEjercicio(ejercicio: Ejercicio): Observable<Ejercicio> {
+    const{id, ...rest}=ejercicio;
+    return this.http.post<Ejercicio>(this.baseURI+'?entrenador=1', rest);
+  }
+
+  editarEjercicio(ejercicio: Ejercicio): Observable<Ejercicio> {
+    return this.http.put<Ejercicio>(this.baseURI + '/' + ejercicio.id, ejercicio);
+  }
+
+  eliminarEjercicio(id: number): Observable<HttpResponse<string>> {
+    return this.http.delete(this.baseURI + '/' + id, {observe: "response", responseType: 'text'});
   }
 }

@@ -32,7 +32,7 @@
 								<img src="image.jpg" [alt]="ejercicio.multimedia[1]">-->
 								<button class="col-auto btn btn-outline-primary" (click)="editarEjercicio(ejercicio)">Editar Ejercicio</button>
 								  
-								<button class="col-auto btn btn-outline-danger" (click)="eliminarEjercicio(ejercicio)">Eliminar Ejercicio</button>
+								<button class="col-auto btn btn-outline-danger" (click)="eliminarEjercicio(ejercicio.id)">Eliminar Ejercicio</button>
 								</div>
 						</ng-template>
 					</ng-container>
@@ -73,7 +73,7 @@
 									</TABLE>
 									<button class="col-auto btn btn-outline-primary"(click)="editarRutina(rutina)">Editar Rutina</button>
 									  &nbsp;
-									<button class="col-auto btn btn-outline-danger" (click)="eliminarRutina(rutina)">Eliminar Rutina</button>
+									<button class="col-auto btn btn-outline-danger" (click)="eliminarRutina(rutina.id)">Eliminar Rutina</button>
 								</ng-template>
 							</div>
 						</div>

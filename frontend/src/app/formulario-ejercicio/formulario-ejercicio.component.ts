@@ -17,20 +17,17 @@ export class FormularioEjercicioComponent {
     constructor(public modal: NgbActiveModal) { }
 
     guardarEjercicio(): void {
-        console.log('guardar')
-        this.modal.close(this.ejercicio) ;
-        
+        this.ejercicio.multimedia=this.multimediaSeleccionados;
+        this.modal.close(this.ejercicio);
     }
 
     agregarMultimedia(): void {
         this.multimediaSeleccionados.push(this.enlaceMultimedia);
-        this.ejercicio.multimedia.push(this.multimediaSeleccionados[this.multimediaSeleccionados.length-1]);
         this.enlaceMultimedia = '';
     }
 
     eliminarMultimedia(index: number): void {
         this.multimediaSeleccionados.splice(index, 1);
-        this.ejercicio.multimedia.splice(index,1);
       }
    
 }

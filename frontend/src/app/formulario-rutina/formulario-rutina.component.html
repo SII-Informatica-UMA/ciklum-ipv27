@@ -14,7 +14,7 @@
         <div class="col-md-3">
           <label for="elegirEjercicio">Ejercicio:</label>
           <select class="form-control" id="elegirEjercicio" [(ngModel)]="ejer.ejercicio.id">
-            <option *ngFor="let ejercicio of ejerciciosService.getEjercicios()" [value]="ejercicio.id">
+            <option *ngFor="let ejercicio of ejerParaElegir" [value]="ejercicio.id">
               {{ ejercicio.nombre }}
             </option>
           </select>
