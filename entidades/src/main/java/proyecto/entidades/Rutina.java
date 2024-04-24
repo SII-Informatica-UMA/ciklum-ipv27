@@ -1,5 +1,6 @@
-package proyecto.entidades;
 
+
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ public class Rutina {
     private String observaciones;
 
     @OneToMany(mappedBy = "rutina")
-    private Ejs[] ejercicios;
+    private List<Ejs> ejercicios;
 
     public Long getId(){
         return id;
