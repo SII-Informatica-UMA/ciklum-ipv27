@@ -7,6 +7,7 @@ import proyecto.entidades.Rutina;
 public interface RutinaRepository extends JpaRepository<Rutina, Long> {
 	List<Rutina> findAll();
 
+	@SuppressWarnings("unchecked")
 	Rutina save(Rutina rutina);
 
 	void deleteById(Long id);

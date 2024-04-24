@@ -13,6 +13,7 @@ public interface EjsRepository extends JpaRepository<Ejs,EjsId> {
 
     List<Ejs> findAll();
     
+    @SuppressWarnings("unchecked")
     Ejs save(Ejs ejs);
     
     void deleteById(EjsId id);
