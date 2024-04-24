@@ -2,6 +2,7 @@ package proyecto.entidades;
 
 import java.util.Objects;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -11,23 +12,26 @@ import jakarta.persistence.MapsId;
 @Entity
 public class Ejs {
 
-    @EmbeddedId
-    EjsId id;
-    
-    @ManyToOne
-    @MapsId("ejercicioId")
-    @JoinColumn(name="ejercicio_id")
-    Ejercicio ejercicio;
-    
-    @ManyToOne
-    @MapsId("rutinaId")
-    @JoinColumn(name="rutina_id")
-    Rutina rutina;
-    
-    Long series;
-    Long repeticiones;
-    Long duracionMinutos;
-    
+	@EmbeddedId
+	EjsId id;
+
+	@ManyToOne
+	@MapsId("ejercicioId")
+	@JoinColumn(name = "ejercicio_id")
+	Ejercicio ejercicio;
+
+	@ManyToOne
+	@MapsId("rutinaId")
+	@JoinColumn(name = "rutina_id")
+	Rutina rutina;
+
+	@Column(nullable = false)
+	Long series;
+	@Column(nullable = false)
+	Long repeticiones;
+	@Column(nullable = false)
+	Long duracionMinutos;
+
 	public Ejs(EjsId id, Ejercicio ejercicio, Rutina rutina, Long series, Long repeticiones, Long duracionMinutos) {
 		this.id = id;
 		this.ejercicio = ejercicio;
@@ -106,13 +110,9 @@ public class Ejs {
 
 	@Override
 	public String toString() {
-		return "Ejs [id=" + id + ", rutina=" + rutina + ", ejercicio=" + ejercicio + ", series=" + series + ", repeticiones=" + repeticiones
+		return "Ejs [id=" + id + ", rutina=" + rutina + ", ejercicio=" + ejercicio + ", series=" + series
+				+ ", repeticiones=" + repeticiones
 				+ ", duracionMinutos=" + duracionMinutos + "]";
 	}
 
-	
-    
-	
-    
-    
 }
