@@ -1,5 +1,10 @@
+package proyecto.entidades;
+
 import java.io.Serializable;
 import java.util.Objects;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class EjsId implements Serializable{

@@ -1,11 +1,9 @@
+package proyecto.entidades;
 
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-
 import jakarta.persistence.*;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -55,11 +53,11 @@ public class Rutina {
         this.observaciones = observaciones; 
     }
 
-    public Ejs[] getEjercicios(){
+    public List<Ejs> getEjercicios(){
         return ejercicios;
     }
 
-    public void setEjercicios(Ejs[] ejercicios){
+    public void setEjercicios(List<Ejs> ejercicios){
         this.ejercicios = ejercicios;
     }
 
