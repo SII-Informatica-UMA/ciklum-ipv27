@@ -2,7 +2,6 @@ package proyecto.entidades;
 
 import java.util.Objects;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -25,11 +24,8 @@ public class Ejs {
 	@JoinColumn(name = "rutina_id")
 	Rutina rutina;
 
-	@Column(nullable = false)
 	Long series;
-	@Column(nullable = false)
 	Long repeticiones;
-	@Column(nullable = false)
 	Long duracionMinutos;
 
 	public Ejs(EjsId id, Ejercicio ejercicio, Rutina rutina, Long series, Long repeticiones, Long duracionMinutos) {
