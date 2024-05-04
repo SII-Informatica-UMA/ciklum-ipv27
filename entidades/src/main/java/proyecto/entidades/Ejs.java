@@ -37,6 +37,10 @@ public class Ejs {
 		this.duracionMinutos = duracionMinutos;
 	}
 
+	public Ejs() {
+		super();
+	}
+
 	public EjsId getId() {
 		return id;
 	}

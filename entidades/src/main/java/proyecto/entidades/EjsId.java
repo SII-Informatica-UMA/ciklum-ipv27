@@ -20,6 +20,10 @@ public class EjsId implements Serializable{
 		this.rutinaId = rutinaId;
 	}
 
+	public EjsId() {
+		super();
+	}
+
 	public Long getEjercicioId() {
 		return ejercicioId;
 	}
