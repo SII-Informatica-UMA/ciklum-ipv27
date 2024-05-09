@@ -42,14 +42,6 @@ public class RutinaServicio {
         rutina.setEjercicios(ejsEnContexto);
     }
 
-    private void refrescarEjsEjercicio(Ejercicio ejercicio) {
-        var ejsEnContexto = ejercicio.getEjs().stream()
-                .map(ejs -> refrescaEjs(ejs)
-                        .orElseThrow(() -> new EntidadNoEncontradaException("Entidad no encontrada")))
-                .collect(Collectors.toList());
-        ejercicio.setEjs(ejsEnContexto);
-    }
-
     public List<Rutina> obtenerRutinas() {
         return rutinaRepo.findAll();
     }
@@ -101,7 +93,6 @@ public class RutinaServicio {
         if (ejercicioRepo.existsByNombre(ejercicio.getNombre())) {
             throw new EntidadExistenteException("El ejercicio ya existe");
         }
-        refrescarEjsEjercicio(ejercicio);
         ejercicioRepo.save(ejercicio);
         return ejercicio.getId();
     }
@@ -117,7 +108,6 @@ public class RutinaServicio {
 
     public void actualizarEjercicio(Ejercicio ej) {
         if (ejercicioRepo.existsById(ej.getId())) {
-            refrescarEjsEjercicio(ej);
             ejercicioRepo.save(ej);
         } else {
             throw new EntidadNoEncontradaException("El ejercicio con ID " + ej.getId() + " no fue encontrado");

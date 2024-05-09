@@ -36,11 +36,9 @@ public class EjercicioRest {
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public List<EjercicioDTO> obtenerTodosLosEjercicios(UriComponentsBuilder uriBuilder) {
+    public List<EjercicioDTO> obtenerTodosLosEjercicios() {
         var ejercicios = servicio.obtenerEjercicios();
-        Function<Ejercicio, EjercicioDTO> mapper = (ej -> EjercicioDTO.fromEjercicio(ej,
-                ejercicioUriBuilder(uriBuilder.build()),
-                ejsUriBuilder(uriBuilder.build())));
+        Function<Ejercicio, EjercicioDTO> mapper = (ej -> EjercicioDTO.fromEjercicio(ej));
         return ejercicios.stream()
                 .map(mapper)
                 .toList();
@@ -71,24 +69,23 @@ public class EjercicioRest {
     }
 
     @GetMapping("/{idEjercicio}")
-    public ResponseEntity<EjercicioDTO> obtenerEjercicio(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
-        var ejercicio = servicio.obtenerEjercicio(id);
-        return ResponseEntity.ok(EjercicioDTO.fromEjercicio(ejercicio, ejercicioUriBuilder(uriBuilder.build()),
-                ejsUriBuilder(uriBuilder.build())));
+    public ResponseEntity<EjercicioDTO> obtenerEjercicio(@PathVariable Long idEjercicio) {
+        var ejercicio = servicio.obtenerEjercicio(idEjercicio);
+        return ResponseEntity.ok(EjercicioDTO.fromEjercicio(ejercicio));
     }
 
     @PutMapping("/{idEjercicio}")
-    public ResponseEntity<Ejercicio> actualizarEjercicio(@PathVariable Long id,
+    public ResponseEntity<EjercicioDTO> actualizarEjercicio(@PathVariable Long idEjercicio,
             @RequestBody EjercicioDTO ejercicioDTO) {
         Ejercicio ej = ejercicioDTO.ejercicio();
-        ej.setId(id);
+        ej.setId(idEjercicio);
         servicio.actualizarEjercicio(ej);
-        return ResponseEntity.ok(ej);
+        return ResponseEntity.ok(EjercicioDTO.fromEjercicio(ej));
     }
 
     @DeleteMapping("/{idEjercicio}")
-    public ResponseEntity<?> eliminarEjercicio(@PathVariable Long id) {
-        servicio.eliminarEjercicio(id);
+    public ResponseEntity<?> eliminarEjercicio(@PathVariable Long idEjercicio) {
+        servicio.eliminarEjercicio(idEjercicio);
         return ResponseEntity.ok().build();
     }
 

@@ -35,11 +35,9 @@ public class RutinaRest {
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public List<RutinaDTO> obtenerTodasLasRutinas(UriComponentsBuilder uriBuilder) {
+    public List<RutinaDTO> obtenerTodasLasRutinas() {
         var rutinas = servicio.obtenerRutinas();
-        Function<Rutina, RutinaDTO> mapper = (r -> RutinaDTO.fromRutina(r,
-                rutinaUriBuilder(uriBuilder.build()),
-                EjercicioRest.ejsUriBuilder(uriBuilder.build())));
+        Function<Rutina, RutinaDTO> mapper = (r -> RutinaDTO.fromRutina(r));
         return rutinas.stream()
                 .map(mapper)
                 .toList();
@@ -63,24 +61,22 @@ public class RutinaRest {
     }
 
     @GetMapping("/{idRutina}")
-    public ResponseEntity<RutinaDTO> obtenerRutina(@PathVariable Long id, UriComponentsBuilder uriBuilder) {
-        Rutina rutina = servicio.obtenerRutina(id);
-        return ResponseEntity.ok(RutinaDTO.fromRutina(rutina,
-                rutinaUriBuilder(uriBuilder.build()),
-                EjercicioRest.ejsUriBuilder(uriBuilder.build())));
+    public ResponseEntity<RutinaDTO> obtenerRutina(@PathVariable Long idRutina) {
+        Rutina rutina = servicio.obtenerRutina(idRutina);
+        return ResponseEntity.ok(RutinaDTO.fromRutina(rutina));
     }
 
     @PutMapping("/{idRutina}")
-    public ResponseEntity<Rutina> actualizarRutina(@PathVariable Long id, @RequestBody RutinaDTO rutinaDTO) {
+    public ResponseEntity<Rutina> actualizarRutina(@PathVariable Long idRutina, @RequestBody RutinaDTO rutinaDTO) {
         Rutina entidadRutina = rutinaDTO.rutina();
-        entidadRutina.setId(id);
+        entidadRutina.setId(idRutina);
         servicio.actualizarRutina(entidadRutina);
         return ResponseEntity.ok(entidadRutina);
     }
 
     @DeleteMapping("/{idRutina}")
-    public ResponseEntity<?> eliminarRutina(@PathVariable Long id) {
-        servicio.eliminarRutina(id);
+    public ResponseEntity<?> eliminarRutina(@PathVariable Long idRutina) {
+        servicio.eliminarRutina(idRutina);
         return ResponseEntity.ok().build();
     }
 
