@@ -9,7 +9,7 @@ public interface RutinaRepository extends JpaRepository<Rutina, Long> {
 
 	@SuppressWarnings("unchecked")
 	Rutina save(Rutina rutina);
-
+	boolean existsByNombre(String nombre);
 	void deleteById(Long id);
 
 }
