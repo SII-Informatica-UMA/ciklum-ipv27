@@ -56,7 +56,15 @@ public class RutinaServicio {
         if (rutinaRepo.existsByNombre(rutina.getNombre())) {
             throw new EntidadExistenteException("La rutina ya existe");
         }
-        refrescarEjsRutina(rutina);
+        List<Ejs> l = rutina.getEjercicios();
+        rutina.setEjercicios(null);
+        rutina=rutinaRepo.save(rutina);
+        for(Ejs e : l){
+            e.setId(new EjsId(e.getEjercicio().getId(),rutina.getId()));
+            e.setRutina(rutina);
+            ejsRepo.save(e);
+        }
+        rutina.setEjercicios(l);
         rutinaRepo.save(rutina);
         return rutina.getId();
     }

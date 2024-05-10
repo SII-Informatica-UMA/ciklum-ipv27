@@ -2,6 +2,7 @@ package proyecto.entidades;
 
 import java.util.List;
 import java.util.Objects;
+
 import jakarta.persistence.*;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,7 +20,7 @@ public class Rutina {
     private String descripcion;
     private String observaciones;
 
-    @OneToMany(mappedBy = "rutina")
+    @OneToMany(mappedBy = "rutina",cascade = CascadeType.PERSIST)
     private List<Ejs> ejercicios;
 
     public Long getId() {
