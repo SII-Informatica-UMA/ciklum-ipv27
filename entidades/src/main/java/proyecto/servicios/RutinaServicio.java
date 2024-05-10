@@ -43,7 +43,11 @@ public class RutinaServicio {
     }
 
     public List<Rutina> obtenerRutinas() {
-        return rutinaRepo.findAll();
+        List<Rutina> rutinas = rutinaRepo.findAll();
+        if (rutinas.isEmpty()) {
+            throw new EntidadNoEncontradaException("No se encontraron rutinas en la base de datos");
+        }
+        return rutinas;
     }
 
     public Long aniadirRutina(Rutina rutina) {
@@ -89,12 +93,12 @@ public class RutinaServicio {
         return ejercicios;
     }
 
-    public Long aniadirEjercicio(Ejercicio ejercicio) {
+    public Ejercicio aniadirEjercicio(Ejercicio ejercicio) {
         if (ejercicioRepo.existsByNombre(ejercicio.getNombre())) {
             throw new EntidadExistenteException("El ejercicio ya existe");
         }
-        ejercicioRepo.save(ejercicio);
-        return ejercicio.getId();
+        return ejercicioRepo.save(ejercicio);
+
     }
 
     public Ejercicio obtenerEjercicio(Long id) {
@@ -107,7 +111,10 @@ public class RutinaServicio {
     }
 
     public void actualizarEjercicio(Ejercicio ej) {
-        if (ejercicioRepo.existsById(ej.getId())) {
+
+        if (ejercicioRepo.existsByNombre(ej.getNombre())) {
+            throw new EntidadExistenteException("El ejercicio nuevo ya existe");
+        } else if (ejercicioRepo.existsById(ej.getId())) {
             ejercicioRepo.save(ej);
         } else {
             throw new EntidadNoEncontradaException("El ejercicio con ID " + ej.getId() + " no fue encontrado");

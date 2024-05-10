@@ -63,9 +63,11 @@ public class EjercicioRest {
     @PostMapping
     public ResponseEntity<EjercicioDTO> aniadirEjercicio(@RequestBody EjercicioDTO ejercicioDTO,
             UriComponentsBuilder uriBuilder) {
-        Long id = servicio.aniadirEjercicio(ejercicioDTO.ejercicio());
-        return ResponseEntity.created(ejercicioUriBuilder(uriBuilder.build()).apply(id))
-                .build();
+        Ejercicio ejercicio = servicio.aniadirEjercicio(ejercicioDTO.ejercicio());
+        EjercicioDTO ejercicioCreadoDTO = EjercicioDTO.fromEjercicio(ejercicio);
+        URI location = ejercicioUriBuilder(uriBuilder.build()).apply(ejercicio.getId());
+        return ResponseEntity.created(location).body(ejercicioCreadoDTO);
+
     }
 
     @GetMapping("/{idEjercicio}")
