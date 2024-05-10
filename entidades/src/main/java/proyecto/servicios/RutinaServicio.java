@@ -1,5 +1,6 @@
 package proyecto.servicios;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,9 +45,10 @@ public class RutinaServicio {
 
     public List<Rutina> obtenerRutinas() {
         List<Rutina> rutinas = rutinaRepo.findAll();
-        if (rutinas.isEmpty()) {
-            throw new EntidadNoEncontradaException("No se encontraron rutinas en la base de datos");
-        }
+        // if (rutinas.isEmpty()) {
+        // throw new EntidadNoEncontradaException("No se encontraron rutinas en la base
+        // de datos");
+        // }
         return rutinas;
     }
 
@@ -87,13 +89,16 @@ public class RutinaServicio {
 
     public List<Ejercicio> obtenerEjercicios() {
         List<Ejercicio> ejercicios = ejercicioRepo.findAll();
-        if (ejercicios.isEmpty()) {
-            throw new EntidadNoEncontradaException("No se encontraron ejercicios en la base de datos");
-        }
+        // if (ejercicios.isEmpty()) {
+        // throw new EntidadNoEncontradaException("No se encontraron ejercicios en la
+        // base de datos");
+        // }
         return ejercicios;
     }
 
     public Ejercicio aniadirEjercicio(Ejercicio ejercicio) {
+        ejercicio.setId(null);
+        ejercicio.setEjs(Collections.emptyList());
         if (ejercicioRepo.existsByNombre(ejercicio.getNombre())) {
             throw new EntidadExistenteException("El ejercicio ya existe");
         }
