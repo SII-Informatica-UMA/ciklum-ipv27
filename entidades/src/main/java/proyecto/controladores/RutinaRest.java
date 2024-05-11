@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 
-import proyecto.dtos.EjercicioDTO;
 import proyecto.dtos.RutinaDTO;
 import proyecto.entidades.*;
 import proyecto.servicios.RutinaServicio;
@@ -69,8 +68,10 @@ public class RutinaRest {
     @PutMapping("/{idRutina}")
     public ResponseEntity<RutinaDTO> actualizarRutina(@PathVariable Long idRutina, @RequestBody RutinaDTO rutinaDTO) {
         Rutina entidadRutina = rutinaDTO.rutina();
+        List<Ejs> l= entidadRutina.getEjercicios();
         entidadRutina.setId(idRutina);
         servicio.actualizarRutina(entidadRutina);
+        entidadRutina.setEjercicios(l);
         return ResponseEntity.ok(RutinaDTO.fromRutina(entidadRutina));
     }
 

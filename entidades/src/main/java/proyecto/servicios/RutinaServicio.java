@@ -3,8 +3,6 @@ package proyecto.servicios;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,22 +23,6 @@ public class RutinaServicio {
         this.rutinaRepo = rutinaRepo;
         this.ejercicioRepo = ejercicioRepo;
         this.ejsRepo = ejsRepo;
-    }
-
-    private Optional<Ejs> refrescaEjs(Ejs ejs) {
-        if (ejs.getId() != null) {
-            return ejsRepo.findById(ejs.getId());
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    private void refrescarEjsRutina(Rutina rutina) {
-        var ejsEnContexto = rutina.getEjercicios().stream()
-                .map(ejs -> refrescaEjs(ejs)
-                        .orElseThrow(() -> new EntidadNoEncontradaException("Entidad no encontrada")))
-                .collect(Collectors.toList());
-        rutina.setEjercicios(ejsEnContexto);
     }
 
     public List<Rutina> obtenerRutinas() {
@@ -94,7 +76,7 @@ public class RutinaServicio {
                 ejsRepo.save(e);
             }
             entidadRutina.setEjercicios(l);
-            rutinaRepo.save(entidadRutina);
+            entidadRutina=rutinaRepo.save(entidadRutina);
 
         } else {
             throw new EntidadNoEncontradaException("La rutina con ID " + entidadRutina.getId() + " no fue encontrada");
