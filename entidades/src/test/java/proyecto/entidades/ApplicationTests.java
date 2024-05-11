@@ -17,6 +17,7 @@ import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
 
 import proyecto.repositorios.EjercicioRepository;
+import proyecto.repositorios.EjsRepository;
 import proyecto.repositorios.RutinaRepository;
 import proyecto.entidades.*;
 import proyecto.dtos.*;
@@ -45,10 +46,14 @@ class ApplicationTests {
 	@Autowired
 	private EjercicioRepository ejercicioRepository;
 
+	@Autowired
+	private EjsRepository ejsRepository;
+
 	@BeforeEach
 	public void initializeDatabase() {
 		rutinaRepository.deleteAll();
 		ejercicioRepository.deleteAll();
+		ejsRepository.deleteAll();
 	}
 
 	private URI uri(String scheme, String host, int port, String... paths) {
@@ -112,12 +117,38 @@ class ApplicationTests {
 		}
 
 		@Test
+		@DisplayName("devuelve la lista de rutinas vacía")
+		public void devuelveRutinas() {
+
+			var peticion = get("http", "localhost", port, "/rutina");
+
+			var respuesta = restTemplate.exchange(peticion,
+					new ParameterizedTypeReference<List<Rutina>>() {
+					});
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(respuesta.getBody()).isEmpty();
+		}
+
+		@Test
 		@DisplayName("devuelve error al obtener un ejercicio concreto")
 		public void errorAlObtenerEjercicioConcreto() {
 			var peticion = get("http", "localhost", port, "/ejercicio/1");
 
 			var respuesta = restTemplate.exchange(peticion,
 					new ParameterizedTypeReference<Ejercicio>() {
+					});
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+		}
+
+		@Test
+		@DisplayName("devuelve error al obtener una rutina concreta")
+		public void errorAlObtenerRutinaConcreto() {
+			var peticion = get("http", "localhost", port, "/rutina/1");
+
+			var respuesta = restTemplate.exchange(peticion,
+					new ParameterizedTypeReference<Rutina>() {
 					});
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
@@ -138,6 +169,16 @@ class ApplicationTests {
 		@DisplayName("devuelve error al eliminar un ejercicio que no existe")
 		public void eliminarEjercicioInexistente() {
 			var peticion = delete("http", "localhost", port, "/ejercicio/1");
+
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+		}
+
+		@Test
+		@DisplayName("devuelve error al eliminar una rutina que no existe")
+		public void eliminarRutinaInexistente() {
+			var peticion = delete("http", "localhost", port, "/rutina/1");
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -170,6 +211,32 @@ class ApplicationTests {
 			assertThat(ejercicio.getNombre()).isEqualTo(ejercicioBD.get(0).getNombre());
 		}
 
+		@Test
+		@DisplayName("inserta correctamente una rutina")
+		public void insertaRutina() {
+
+			// Preparamos el ingrediente a insertar
+			var rutina = RutinaDTO.builder()
+					.nombre("Rutina1")
+					.build();
+			// Preparamos la petición con el ingrediente dentro
+			var peticion = post("http", "localhost", port, "/rutina", rutina);
+
+			// Invocamos al servicio REST
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+
+			// Comprobamos el resultado
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
+			assertThat(respuesta.getHeaders().get("Location").get(0))
+					.startsWith("http://localhost:" + port + "/rutina");
+
+			List<Rutina> rutinasBD = rutinaRepository.findAll();
+			assertThat(rutinasBD).hasSize(1);
+			assertThat(respuesta.getHeaders().get("Location").get(0))
+					.endsWith("/" + rutinasBD.get(0).getId());
+			assertThat(rutina.getNombre()).isEqualTo(rutinasBD.get(0).getNombre());
+		}
+
 	}
 
 	@Nested
@@ -181,6 +248,13 @@ class ApplicationTests {
 			var ejercicio = new Ejercicio();
 			ejercicio.setNombre("Ejercicio1");
 			ejercicioRepository.save(ejercicio);
+
+			var rutina = new Rutina();
+			rutina.setNombre("Rutina1");
+			rutinaRepository.save(rutina);
+			var ejsId = new EjsId(ejercicio.getId(), rutina.getId());
+			var ejs = new Ejs(ejsId, ejercicio, rutina, 0L, 0L, 0L);
+			ejsRepository.save(ejs);
 		}
 
 		@Test
@@ -215,6 +289,24 @@ class ApplicationTests {
 		}
 
 		@Test
+		@DisplayName("da error cuando inserta una rutina que ya existe")
+		public void insertaRutinaExistente() {
+
+			// Preparamos el ingrediente a insertar
+			var rutina = RutinaDTO.builder()
+					.nombre("Rutina1")
+					.build();
+			// Preparamos la petición con el ingrediente dentro
+			var peticion = post("http", "localhost", port, "/rutina", rutina);
+
+			// Invocamos al servicio REST
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+
+			// Comprobamos el resultado
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+		}
+
+		@Test
 		@DisplayName("obtiene un ejercicio concreto")
 		public void obtenerNivelConcreto() {
 			var peticion = get("http", "localhost", port, "/ejercicio/1");
@@ -225,6 +317,19 @@ class ApplicationTests {
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(respuesta.getBody().getNombre()).isEqualTo("Ejercicio1");
+		}
+
+		@Test
+		@DisplayName("obtiene una rutina concreta")
+		public void obtenerRutinaConcreto() {
+			var peticion = get("http", "localhost", port, "/rutina/1");
+
+			var respuesta = restTemplate.exchange(peticion,
+					new ParameterizedTypeReference<Rutina>() {
+					});
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(respuesta.getBody().getNombre()).isEqualTo("Rutina1");
 		}
 
 		@Test
@@ -261,6 +366,21 @@ class ApplicationTests {
 			ejercicioRepository.save(ejercicio);
 
 			var peticion = delete("http", "localhost", port, "/ejercicio/2");
+
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(ejercicioRepository.count()).isEqualTo(1);
+		}
+
+		@Test
+		@DisplayName("eliminar una rutina correctamente")
+		public void eliminarRutina() {
+			var rutina = new Rutina();
+			rutina.setNombre("Rutina2");
+			rutinaRepository.save(rutina);
+
+			var peticion = delete("http", "localhost", port, "/rutina/2");
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
