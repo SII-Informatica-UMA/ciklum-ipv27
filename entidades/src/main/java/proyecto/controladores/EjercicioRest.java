@@ -52,13 +52,6 @@ public class EjercicioRest {
                 .toUri();
     }
 
-    public static Function<EjsId, URI> ejsUriBuilder(UriComponents uriComponents) {
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.newInstance().uriComponents(uriComponents);
-        return id -> uriBuilder.path("/ejercicio")
-                .path(String.format("/%d", id))
-                .build()
-                .toUri();
-    }
 
     @PostMapping
     public ResponseEntity<EjercicioDTO> aniadirEjercicio(@RequestBody EjercicioDTO ejercicioDTO,

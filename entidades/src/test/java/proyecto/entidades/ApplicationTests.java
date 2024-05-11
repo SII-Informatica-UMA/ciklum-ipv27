@@ -19,11 +19,9 @@ import org.springframework.web.util.UriBuilderFactory;
 import proyecto.repositorios.EjercicioRepository;
 import proyecto.repositorios.EjsRepository;
 import proyecto.repositorios.RutinaRepository;
-import proyecto.entidades.*;
 import proyecto.dtos.*;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -189,17 +187,13 @@ class ApplicationTests {
 		@DisplayName("inserta correctamente un ejercicio")
 		public void insertaEjercicio() {
 
-			// Preparamos el ingrediente a insertar
 			var ejercicio = EjercicioDTO.builder()
 					.nombre("Ejercicio1")
 					.build();
-			// Preparamos la petición con el ingrediente dentro
 			var peticion = post("http", "localhost", port, "/ejercicio", ejercicio);
 
-			// Invocamos al servicio REST
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
-			// Comprobamos el resultado
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 					.startsWith("http://localhost:" + port + "/ejercicio");
@@ -215,17 +209,13 @@ class ApplicationTests {
 		@DisplayName("inserta correctamente una rutina")
 		public void insertaRutina() {
 
-			// Preparamos el ingrediente a insertar
 			var rutina = RutinaDTO.builder()
 					.nombre("Rutina1")
 					.build();
-			// Preparamos la petición con el ingrediente dentro
 			var peticion = post("http", "localhost", port, "/rutina", rutina);
 
-			// Invocamos al servicio REST
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
-			// Comprobamos el resultado
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 					.startsWith("http://localhost:" + port + "/rutina");
@@ -255,6 +245,8 @@ class ApplicationTests {
 			var ejsId = new EjsId(ejercicio.getId(), rutina.getId());
 			var ejs = new Ejs(ejsId, ejercicio, rutina, 0L, 0L, 0L);
 			ejsRepository.save(ejs);
+			rutina.setEjercicios(Collections.singletonList(ejs));
+			rutinaRepository.save(rutina);
 		}
 
 		@Test
@@ -271,20 +263,29 @@ class ApplicationTests {
 		}
 
 		@Test
+		@DisplayName("devuelve una lista de rutinas")
+		public void devuelveListaRutinas() {
+			var peticion = get("http", "localhost", port, "/rutina");
+
+			var respuesta = restTemplate.exchange(peticion,
+					new ParameterizedTypeReference<List<Rutina>>() {
+					});
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(respuesta.getBody().size()).isEqualTo(1);
+		}
+
+		@Test
 		@DisplayName("da error cuando inserta un ejercicio que ya existe")
 		public void insertaEjercicioExistente() {
 
-			// Preparamos el ingrediente a insertar
 			var ejercicio = EjercicioDTO.builder()
 					.nombre("Ejercicio1")
 					.build();
-			// Preparamos la petición con el ingrediente dentro
 			var peticion = post("http", "localhost", port, "/ejercicio", ejercicio);
 
-			// Invocamos al servicio REST
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
-			// Comprobamos el resultado
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
 		}
 
@@ -292,23 +293,19 @@ class ApplicationTests {
 		@DisplayName("da error cuando inserta una rutina que ya existe")
 		public void insertaRutinaExistente() {
 
-			// Preparamos el ingrediente a insertar
 			var rutina = RutinaDTO.builder()
 					.nombre("Rutina1")
 					.build();
-			// Preparamos la petición con el ingrediente dentro
 			var peticion = post("http", "localhost", port, "/rutina", rutina);
 
-			// Invocamos al servicio REST
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
-			// Comprobamos el resultado
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
 		}
 
 		@Test
 		@DisplayName("obtiene un ejercicio concreto")
-		public void obtenerNivelConcreto() {
+		public void obtenerEjercicioConcreto() {
 			var peticion = get("http", "localhost", port, "/ejercicio/1");
 
 			var respuesta = restTemplate.exchange(peticion,
@@ -334,7 +331,7 @@ class ApplicationTests {
 
 		@Test
 		@DisplayName("modificar un ejercicio correctamente")
-		public void modificarNivel() {
+		public void modificarEjercicio() {
 			var ejercicio = EjercicioDTO.builder().nombre("EjercicioCambio").build();
 			var peticion = put("http", "localhost", port, "/ejercicio/1", ejercicio);
 
@@ -342,6 +339,47 @@ class ApplicationTests {
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(ejercicioRepository.findById(1L).get().getNombre()).isEqualTo("EjercicioCambio");
+		}
+
+		@Test
+		@DisplayName("modificar una rutina correctamente")
+		public void modificarRutina() {
+			var ejercicio = ejercicioRepository.findById(1L).orElseThrow(() -> new RuntimeException("Ejercicio not found"));
+
+			var rutina = RutinaDTO.builder().nombre("RutinaCambio").build();
+			var ejs = EjsDTO.builder().ejercicio(EjercicioDTO.fromEjercicio(ejercicio)).build();
+			rutina.setEjercicios(Collections.singletonList(ejs));
+			var peticion = put("http", "localhost", port, "/rutina/1", rutina);
+
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(rutinaRepository.findById(1L).get().getNombre()).isEqualTo("RutinaCambio");
+		}
+
+		@Test
+		@DisplayName("inserta correctamente una rutina con ejercicio")
+		public void insertaRutina() {
+
+			var ejercicio = ejercicioRepository.findById(1L).orElseThrow(() -> new RuntimeException("Ejercicio not found"));
+
+			var rutina = RutinaDTO.builder().nombre("Rutina2").build();
+			var ejs = EjsDTO.builder().ejercicio(EjercicioDTO.fromEjercicio(ejercicio)).build();
+			rutina.setEjercicios(Collections.singletonList(ejs));
+
+			var peticion = post("http", "localhost", port, "/rutina", rutina);
+
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(201);
+			assertThat(respuesta.getHeaders().get("Location").get(0))
+					.startsWith("http://localhost:" + port + "/rutina");
+
+			List<Rutina> rutinasBD = rutinaRepository.findAll();
+			assertThat(rutinasBD).hasSize(2);
+			assertThat(respuesta.getHeaders().get("Location").get(0))
+					.endsWith("/" + rutinasBD.get(1).getId());
+			assertThat(rutina.getNombre()).isEqualTo(rutinasBD.get(1).getNombre());
 		}
 
 		@Test
@@ -356,6 +394,43 @@ class ApplicationTests {
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+		}
+
+		@Test
+		@DisplayName("da error al modificar una rutina con un nombre ya existente")
+		public void modificarRutinaConNombreExistente() {
+			var cambio = new Rutina();
+			cambio.setNombre("Rutina2");
+			rutinaRepository.save(cambio);
+			var rutina = RutinaDTO.builder().nombre("Rutina1").build();
+			var peticion = put("http", "localhost", port, "/rutina/2", rutina);
+
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+		}
+
+		@Test
+		@DisplayName("da error al modificar una rutina que no existe")
+		public void modificarRutinaNoExistente() {
+			var cambio = new Rutina();
+			cambio.setNombre("Rutina2");
+			var peticion = put("http", "localhost", port, "/rutina/2", cambio);
+
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+		}
+
+		@Test
+		@DisplayName("da error al eliminar un ejercicio cuando hay una rutina que lo esta usando")
+		public void eliminarEjercicioConRutinaAsociada() {
+			
+			var peticion = delete("http", "localhost", port, "/ejercicio/1");
+
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(417);
 		}
 
 		@Test
@@ -376,8 +451,15 @@ class ApplicationTests {
 		@Test
 		@DisplayName("eliminar una rutina correctamente")
 		public void eliminarRutina() {
+			var ejercicio = ejercicioRepository.findById(1L).orElseThrow(() -> new RuntimeException("Ejercicio not found"));
+
 			var rutina = new Rutina();
 			rutina.setNombre("Rutina2");
+			rutinaRepository.save(rutina);
+			var ejsId = new EjsId(ejercicio.getId(), rutina.getId());
+			var ejs = new Ejs(ejsId, ejercicio, rutina, 0L, 0L, 0L);
+			ejsRepository.save(ejs);
+			rutina.setEjercicios(Collections.singletonList(ejs));
 			rutinaRepository.save(rutina);
 
 			var peticion = delete("http", "localhost", port, "/rutina/2");
@@ -385,7 +467,7 @@ class ApplicationTests {
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-			assertThat(ejercicioRepository.count()).isEqualTo(1);
+			assertThat(rutinaRepository.count()).isEqualTo(1);
 		}
 
 	}

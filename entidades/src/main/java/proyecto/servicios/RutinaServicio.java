@@ -139,7 +139,10 @@ public class RutinaServicio {
 
     public void eliminarEjercicio(Long id) {
         if (ejercicioRepo.existsById(id)) {
-            ejercicioRepo.deleteById(id);
+            if(ejercicioRepo.getReferenceById(id).getEjs().isEmpty())
+                ejercicioRepo.deleteById(id);
+            else 
+                throw new EjercicioNoEliminadoException("El ejercicio esta siendo usado en alguna rutina");
         } else {
             throw new EntidadNoEncontradaException("El ejercicio con ID " + id + " no fue encontrado");
         }
