@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 
+import proyecto.dtos.EjercicioDTO;
 import proyecto.dtos.RutinaDTO;
 import proyecto.entidades.*;
 import proyecto.servicios.RutinaServicio;
@@ -53,11 +54,10 @@ public class RutinaRest {
 
     @PostMapping
     public ResponseEntity<RutinaDTO> aniadirRutina(@RequestBody RutinaDTO rutinaDTO, UriComponentsBuilder uriBuilder) {
-        Rutina rutina = rutinaDTO.rutina();
-        Long id = servicio.aniadirRutina(rutina);
-        return ResponseEntity.created(
-                rutinaUriBuilder(uriBuilder.build()).apply(id))
-                .build();
+        Rutina rutina = servicio.aniadirRutina(rutinaDTO.rutina());
+        RutinaDTO rutinaCreadaDTO = RutinaDTO.fromRutina(rutina);
+        URI location = rutinaUriBuilder(uriBuilder.build()).apply(rutina.getId());
+        return ResponseEntity.created(location).body(rutinaCreadaDTO);
     }
 
     @GetMapping("/{idRutina}")
@@ -67,11 +67,11 @@ public class RutinaRest {
     }
 
     @PutMapping("/{idRutina}")
-    public ResponseEntity<Rutina> actualizarRutina(@PathVariable Long idRutina, @RequestBody RutinaDTO rutinaDTO) {
+    public ResponseEntity<RutinaDTO> actualizarRutina(@PathVariable Long idRutina, @RequestBody RutinaDTO rutinaDTO) {
         Rutina entidadRutina = rutinaDTO.rutina();
         entidadRutina.setId(idRutina);
         servicio.actualizarRutina(entidadRutina);
-        return ResponseEntity.ok(entidadRutina);
+        return ResponseEntity.ok(RutinaDTO.fromRutina(entidadRutina));
     }
 
     @DeleteMapping("/{idRutina}")

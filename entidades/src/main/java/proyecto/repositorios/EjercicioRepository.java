@@ -19,4 +19,6 @@ public interface EjercicioRepository extends JpaRepository<Ejercicio, Long> {
 
     Optional<Ejs> findFirstByNombre(String nombre);
 
+    Optional<Ejercicio> findByNombreAndIdNot(String nombre, Long id);
+
 }

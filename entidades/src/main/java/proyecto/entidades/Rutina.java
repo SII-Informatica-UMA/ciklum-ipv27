@@ -20,7 +20,7 @@ public class Rutina {
     private String descripcion;
     private String observaciones;
 
-    @OneToMany(mappedBy = "rutina",cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "rutina", cascade = CascadeType.PERSIST)
     private List<Ejs> ejercicios;
 
     public Long getId() {
