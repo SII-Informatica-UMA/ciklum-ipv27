@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -35,8 +36,8 @@ public class RutinaRest {
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public List<RutinaDTO> obtenerTodasLasRutinas() {
-        var rutinas = servicio.obtenerRutinas();
+    public List<RutinaDTO> obtenerTodasLasRutinas(@RequestParam(value = "entrenador",required = true) Long idEntrenador) {
+        var rutinas = servicio.obtenerRutinas(idEntrenador);
         Function<Rutina, RutinaDTO> mapper = (r -> RutinaDTO.fromRutina(r));
         return rutinas.stream()
                 .map(mapper)
@@ -52,7 +53,8 @@ public class RutinaRest {
     }
 
     @PostMapping
-    public ResponseEntity<RutinaDTO> aniadirRutina(@RequestBody RutinaDTO rutinaDTO, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<RutinaDTO> aniadirRutina(@RequestParam(value = "entrenador",required = true) Long idEntrenador, @RequestBody RutinaDTO rutinaDTO, UriComponentsBuilder uriBuilder) {
+        rutinaDTO.setEntrenadorId(idEntrenador);
         Rutina rutina = servicio.aniadirRutina(rutinaDTO.rutina());
         RutinaDTO rutinaCreadaDTO = RutinaDTO.fromRutina(rutina);
         URI location = rutinaUriBuilder(uriBuilder.build()).apply(rutina.getId());

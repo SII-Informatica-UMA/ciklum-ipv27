@@ -19,6 +19,7 @@ import proyecto.entidades.Rutina;
 @Builder
 public class RutinaDTO {
     private Long id;
+    private Long entrenadorId;
     private String nombre;
     private String descripcion;
     private String observaciones;
@@ -28,6 +29,7 @@ public class RutinaDTO {
     public static RutinaDTO fromRutina(Rutina rutina) {
         var dto = new RutinaDTO();
         dto.setId(rutina.getId());
+        dto.setEntrenadorId(rutina.getEntrenadorId());
         dto.setNombre(rutina.getNombre());
         dto.setDescripcion(rutina.getDescripcion());
         dto.setObservaciones(rutina.getObservaciones());
@@ -42,6 +44,7 @@ public class RutinaDTO {
     public Rutina rutina() {
         Rutina rutina = new Rutina();
         rutina.setId(id);
+        rutina.setEntrenadorId(entrenadorId);
         rutina.setNombre(nombre);
         rutina.setDescripcion(descripcion);
         rutina.setObservaciones(observaciones);

@@ -18,4 +18,5 @@ public interface RutinaRepository extends JpaRepository<Rutina, Long> {
 
 	Optional<Rutina> findByNombreAndIdNot(String nombre, Long id);
 
+	List<Rutina> findAllByEntrenadorId(Long entrenadorId);
 }

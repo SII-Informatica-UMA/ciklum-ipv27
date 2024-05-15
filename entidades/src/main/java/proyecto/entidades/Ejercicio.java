@@ -13,6 +13,8 @@ public class Ejercicio {
     @GeneratedValue
     private Long id;
 
+    private Long entrenadorId;
+
     @Column(nullable = false)
     private String nombre;
     private String descripcion;
@@ -32,6 +34,14 @@ public class Ejercicio {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getEntrenadorId() {
+        return entrenadorId;
+    }
+
+    public void setEntrenadorId(Long id) {
+        this.entrenadorId = id;
     }
 
     public String getNombre() {
@@ -126,7 +136,7 @@ public class Ejercicio {
         }
 
         Ejercicio other = (Ejercicio) obj;
-        return Objects.equals(id, other.id) && Objects.equals(nombre, other.nombre)
+        return Objects.equals(id, other.id) && Objects.equals(entrenadorId, other.entrenadorId) && Objects.equals(nombre, other.nombre)
                 && Objects.equals(descripcion, other.descripcion) &&
                 Objects.equals(observaciones, other.observaciones) && Objects.equals(tipo, other.tipo)
                 && Objects.equals(musculosTrabajados, other.musculosTrabajados) &&
@@ -137,7 +147,7 @@ public class Ejercicio {
 
     @Override
     public String toString() {
-        return "Ejercicio [id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion +
+        return "Ejercicio [id=" + id + " ,entrenadorId=" + entrenadorId + ", nombre=" + nombre + ", descripcion=" + descripcion +
                 ", observaciones=" + observaciones + ", tipo=" + tipo + ", musculosTrabajados=" + musculosTrabajados +
                 ", material=" + material + ", dificultad=" + dificultad + ", multimedia=" + multimedia + ", ejs=" + ejs
                 + "]";

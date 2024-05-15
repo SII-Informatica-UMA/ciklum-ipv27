@@ -14,6 +14,8 @@ public class Rutina {
     @Id
     @GeneratedValue
     private Long id;
+    private Long entrenadorId;
+
 
     @Column(nullable = false)
     private String nombre;
@@ -29,6 +31,14 @@ public class Rutina {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getEntrenadorId() {
+        return entrenadorId;
+    }
+
+    public void setEntrenadorId(Long id) {
+        this.entrenadorId = id;
     }
 
     public String getNombre() {
@@ -83,14 +93,14 @@ public class Rutina {
         }
 
         Rutina other = (Rutina) obj;
-        return Objects.equals(id, other.id) && Objects.equals(nombre, other.nombre)
+        return Objects.equals(id, other.id) && Objects.equals(entrenadorId, other.entrenadorId) && Objects.equals(nombre, other.nombre)
                 && Objects.equals(descripcion, other.descripcion) &&
                 Objects.equals(observaciones, other.observaciones) && Objects.equals(ejercicios, other.ejercicios);
     }
 
     @Override
     public String toString() {
-        return "Rutina [id=" + id + ", nombre=" + nombre + ", descripcion=" + descripcion +
+        return "Rutina [id=" + id + " ,entrenadorId=" + entrenadorId + ", nombre=" + nombre + ", descripcion=" + descripcion +
                 ", observaciones=" + observaciones + "ejercicios=" + ejercicios + "]";
     }
 }

@@ -21,4 +21,5 @@ public interface EjercicioRepository extends JpaRepository<Ejercicio, Long> {
 
     Optional<Ejercicio> findByNombreAndIdNot(String nombre, Long id);
 
+    List<Ejercicio> findAllByEntrenadorId(Long entrenadorId);
 }

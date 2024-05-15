@@ -15,6 +15,7 @@ import lombok.Setter;
 @Builder
 public class EjercicioDTO {
     private Long id;
+    private Long entrenadorId;
     private String nombre;
     private String descripcion;
     private String observaciones;
@@ -27,6 +28,7 @@ public class EjercicioDTO {
     public static EjercicioDTO fromEjercicio(Ejercicio ejercicio) {
         var dto = new EjercicioDTO();
         dto.setId(ejercicio.getId());
+        dto.setEntrenadorId(ejercicio.getEntrenadorId());
         dto.setNombre(ejercicio.getNombre());
         dto.setDescripcion(ejercicio.getDescripcion());
         dto.setObservaciones(ejercicio.getObservaciones());
@@ -41,6 +43,7 @@ public class EjercicioDTO {
     public Ejercicio ejercicio() {
         Ejercicio ejercicio = new Ejercicio();
         ejercicio.setId(id);
+        ejercicio.setEntrenadorId(entrenadorId);
         ejercicio.setNombre(nombre);
         ejercicio.setDescripcion(descripcion);
         ejercicio.setObservaciones(observaciones);

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponents;
@@ -36,8 +37,8 @@ public class EjercicioRest {
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public List<EjercicioDTO> obtenerTodosLosEjercicios() {
-        var ejercicios = servicio.obtenerEjercicios();
+    public List<EjercicioDTO> obtenerTodosLosEjercicios(@RequestParam(value = "entrenador",required = true) Long idEntrenador) {
+        var ejercicios = servicio.obtenerEjercicios(idEntrenador);
         Function<Ejercicio, EjercicioDTO> mapper = (ej -> EjercicioDTO.fromEjercicio(ej));
         return ejercicios.stream()
                 .map(mapper)
@@ -54,8 +55,9 @@ public class EjercicioRest {
 
 
     @PostMapping
-    public ResponseEntity<EjercicioDTO> aniadirEjercicio(@RequestBody EjercicioDTO ejercicioDTO,
+    public ResponseEntity<EjercicioDTO> aniadirEjercicio(@RequestParam(value="entrenador") Long idEntrenador, @RequestBody EjercicioDTO ejercicioDTO,
             UriComponentsBuilder uriBuilder) {
+        ejercicioDTO.setEntrenadorId(idEntrenador);
         Ejercicio ejercicio = servicio.aniadirEjercicio(ejercicioDTO.ejercicio());
         EjercicioDTO ejercicioCreadoDTO = EjercicioDTO.fromEjercicio(ejercicio);
         URI location = ejercicioUriBuilder(uriBuilder.build()).apply(ejercicio.getId());

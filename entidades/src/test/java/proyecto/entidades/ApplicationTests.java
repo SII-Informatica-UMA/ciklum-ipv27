@@ -54,7 +54,7 @@ class ApplicationTests {
 		ejsRepository.deleteAll();
 	}
 
-	private URI uri(String scheme, String host, int port, String... paths) {
+	private URI uri(String scheme, String host, int port, Long entrenadorId, String... paths) {
 		UriBuilderFactory ubf = new DefaultUriBuilderFactory();
 		UriBuilder ub = ubf.builder()
 				.scheme(scheme)
@@ -62,11 +62,14 @@ class ApplicationTests {
 		for (String path : paths) {
 			ub = ub.path(path);
 		}
+		if(entrenadorId!=null){
+			ub.queryParam("entrenador", entrenadorId);
+		}
 		return ub.build();
 	}
 
 	private RequestEntity<Void> get(String scheme, String host, int port, String path) {
-		URI uri = uri(scheme, host, port, path);
+		URI uri = uri(scheme, host, port, 1L, path);
 		var peticion = RequestEntity.get(uri)
 				.accept(MediaType.APPLICATION_JSON)
 				.build();
@@ -74,14 +77,14 @@ class ApplicationTests {
 	}
 
 	private RequestEntity<Void> delete(String scheme, String host, int port, String path) {
-		URI uri = uri(scheme, host, port, path);
+		URI uri = uri(scheme, host, port,null, path);
 		var peticion = RequestEntity.delete(uri)
 				.build();
 		return peticion;
 	}
 
 	private <T> RequestEntity<T> post(String scheme, String host, int port, String path, T object) {
-		URI uri = uri(scheme, host, port, path);
+		URI uri = uri(scheme, host, port, 1L, path);
 		var peticion = RequestEntity.post(uri)
 				.contentType(MediaType.APPLICATION_JSON)
 				.body(object);
@@ -89,7 +92,7 @@ class ApplicationTests {
 	}
 
 	private <T> RequestEntity<T> put(String scheme, String host, int port, String path, T object) {
-		URI uri = uri(scheme, host, port, path);
+		URI uri = uri(scheme, host, port, null, path);
 		var peticion = RequestEntity.put(uri)
 				.contentType(MediaType.APPLICATION_JSON)
 				.body(object);
@@ -198,7 +201,7 @@ class ApplicationTests {
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 					.startsWith("http://localhost:" + port + "/ejercicio");
 
-			List<Ejercicio> ejercicioBD = ejercicioRepository.findAll();
+			List<Ejercicio> ejercicioBD = ejercicioRepository.findAllByEntrenadorId(1L);
 			assertThat(ejercicioBD).hasSize(1);
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 					.endsWith("/" + ejercicioBD.get(0).getId());
@@ -220,7 +223,7 @@ class ApplicationTests {
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 					.startsWith("http://localhost:" + port + "/rutina");
 
-			List<Rutina> rutinasBD = rutinaRepository.findAll();
+			List<Rutina> rutinasBD = rutinaRepository.findAllByEntrenadorId(1L);
 			assertThat(rutinasBD).hasSize(1);
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 					.endsWith("/" + rutinasBD.get(0).getId());
@@ -237,10 +240,12 @@ class ApplicationTests {
 		public void insertarDatos() {
 			var ejercicio = new Ejercicio();
 			ejercicio.setNombre("Ejercicio1");
+			ejercicio.setEntrenadorId(1L);
 			ejercicioRepository.save(ejercicio);
 
 			var rutina = new Rutina();
 			rutina.setNombre("Rutina1");
+			rutina.setEntrenadorId(1L);
 			rutinaRepository.save(rutina);
 			var ejsId = new EjsId(ejercicio.getId(), rutina.getId());
 			var ejs = new Ejs(ejsId, ejercicio, rutina, 0L, 0L, 0L);
@@ -375,7 +380,7 @@ class ApplicationTests {
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 					.startsWith("http://localhost:" + port + "/rutina");
 
-			List<Rutina> rutinasBD = rutinaRepository.findAll();
+			List<Rutina> rutinasBD = rutinaRepository.findAllByEntrenadorId(1L);
 			assertThat(rutinasBD).hasSize(2);
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 					.endsWith("/" + rutinasBD.get(1).getId());

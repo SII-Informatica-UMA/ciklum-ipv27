@@ -25,12 +25,8 @@ public class RutinaServicio {
         this.ejsRepo = ejsRepo;
     }
 
-    public List<Rutina> obtenerRutinas() {
-        List<Rutina> rutinas = rutinaRepo.findAll();
-        // if (rutinas.isEmpty()) {
-        // throw new EntidadNoEncontradaException("No se encontraron rutinas en la base
-        // de datos");
-        // }
+    public List<Rutina> obtenerRutinas(Long entrenadorId) {
+        List<Rutina> rutinas = rutinaRepo.findAllByEntrenadorId(entrenadorId);
         return rutinas;
     }
 
@@ -96,12 +92,8 @@ public class RutinaServicio {
         }
     }
 
-    public List<Ejercicio> obtenerEjercicios() {
-        List<Ejercicio> ejercicios = ejercicioRepo.findAll();
-        // if (ejercicios.isEmpty()) {
-        // throw new EntidadNoEncontradaException("No se encontraron ejercicios en la
-        // base de datos");
-        // }
+    public List<Ejercicio> obtenerEjercicios(Long idEntrenador) {
+        List<Ejercicio> ejercicios = ejercicioRepo.findAllByEntrenadorId(idEntrenador);
         return ejercicios;
     }
 
