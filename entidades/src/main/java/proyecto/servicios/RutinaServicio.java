@@ -31,9 +31,11 @@ public class RutinaServicio {
     }
 
     public Rutina aniadirRutina(Rutina rutina) {
-        if (rutinaRepo.existsByNombre(rutina.getNombre())) {
-            throw new EntidadExistenteException("La rutina ya existe");
-        }
+        /*
+         * if (rutinaRepo.existsByNombre(rutina.getNombre())) {
+         * throw new EntidadExistenteException("La rutina ya existe");
+         * }
+         */
         List<Ejs> l = rutina.getEjercicios();
         rutina.setEjercicios(null);
         rutina = rutinaRepo.save(rutina);
@@ -57,12 +59,16 @@ public class RutinaServicio {
 
     public void actualizarRutina(Rutina entidadRutina) {
 
-        Optional<Rutina> rutinaExistente = rutinaRepo.findByNombreAndIdNot(entidadRutina.getNombre(),
-                entidadRutina.getId());
-
-        if (rutinaExistente.isPresent()) {
-            throw new EntidadExistenteException("La rutina nueva ya existe");
-        } else if (rutinaRepo.existsById(entidadRutina.getId())) {
+        /*
+         * Optional<Rutina> rutinaExistente =
+         * rutinaRepo.findByNombreAndIdNot(entidadRutina.getNombre(),
+         * entidadRutina.getId());
+         * 
+         * if (rutinaExistente.isPresent()) {
+         * throw new EntidadExistenteException("La rutina nueva ya existe");
+         * } else
+         */
+        if (rutinaRepo.existsById(entidadRutina.getId())) {
             List<Ejs> l = entidadRutina.getEjercicios();
             entidadRutina.setEjercicios(null);
             entidadRutina = rutinaRepo.save(entidadRutina);
@@ -72,7 +78,7 @@ public class RutinaServicio {
                 ejsRepo.save(e);
             }
             entidadRutina.setEjercicios(l);
-            entidadRutina=rutinaRepo.save(entidadRutina);
+            entidadRutina = rutinaRepo.save(entidadRutina);
 
         } else {
             throw new EntidadNoEncontradaException("La rutina con ID " + entidadRutina.getId() + " no fue encontrada");
@@ -100,9 +106,11 @@ public class RutinaServicio {
     public Ejercicio aniadirEjercicio(Ejercicio ejercicio) {
         ejercicio.setId(null);
         ejercicio.setEjs(Collections.emptyList());
-        if (ejercicioRepo.existsByNombre(ejercicio.getNombre())) {
-            throw new EntidadExistenteException("El ejercicio ya existe");
-        }
+        /*
+         * if (ejercicioRepo.existsByNombre(ejercicio.getNombre())) {
+         * throw new EntidadExistenteException("El ejercicio ya existe");
+         * }
+         */
         return ejercicioRepo.save(ejercicio);
 
     }
@@ -118,11 +126,16 @@ public class RutinaServicio {
 
     public void actualizarEjercicio(Ejercicio ej) {
 
-        Optional<Ejercicio> ejercicioExistente = ejercicioRepo.findByNombreAndIdNot(ej.getNombre(), ej.getId());
-
-        if (ejercicioExistente.isPresent()) {
-            throw new EntidadExistenteException("Ya existe un ejercicio con el mismo nombre");
-        } else if (ejercicioRepo.existsById(ej.getId())) {
+        /*
+         * Optional<Ejercicio> ejercicioExistente =
+         * ejercicioRepo.findByNombreAndIdNot(ej.getNombre(), ej.getId());
+         * 
+         * if (ejercicioExistente.isPresent()) {
+         * throw new
+         * EntidadExistenteException("Ya existe un ejercicio con el mismo nombre");
+         * } else
+         */
+        if (ejercicioRepo.existsById(ej.getId())) {
             ejercicioRepo.save(ej);
         } else {
             throw new EntidadNoEncontradaException("El ejercicio con ID " + ej.getId() + " no fue encontrado");
@@ -131,9 +144,9 @@ public class RutinaServicio {
 
     public void eliminarEjercicio(Long id) {
         if (ejercicioRepo.existsById(id)) {
-            if(ejercicioRepo.getReferenceById(id).getEjs().isEmpty())
+            if (ejercicioRepo.getReferenceById(id).getEjs().isEmpty())
                 ejercicioRepo.deleteById(id);
-            else 
+            else
                 throw new EjercicioNoEliminadoException("El ejercicio esta siendo usado en alguna rutina");
         } else {
             throw new EntidadNoEncontradaException("El ejercicio con ID " + id + " no fue encontrado");

@@ -36,7 +36,8 @@ public class RutinaRest {
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public List<RutinaDTO> obtenerTodasLasRutinas(@RequestParam(value = "entrenador",required = true) Long idEntrenador) {
+    public List<RutinaDTO> obtenerTodasLasRutinas(
+            @RequestParam(value = "entrenador", required = true) Long idEntrenador) {
         var rutinas = servicio.obtenerRutinas(idEntrenador);
         Function<Rutina, RutinaDTO> mapper = (r -> RutinaDTO.fromRutina(r));
         return rutinas.stream()
@@ -45,7 +46,7 @@ public class RutinaRest {
     }
 
     public static Function<Long, URI> rutinaUriBuilder(UriComponents uriBuilder) {
-        ;
+
         return id -> UriComponentsBuilder.newInstance().uriComponents(uriBuilder).path("/rutina")
                 .path(String.format("/%d", id))
                 .build()
@@ -53,7 +54,9 @@ public class RutinaRest {
     }
 
     @PostMapping
-    public ResponseEntity<RutinaDTO> aniadirRutina(@RequestParam(value = "entrenador",required = true) Long idEntrenador, @RequestBody RutinaDTO rutinaDTO, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<RutinaDTO> aniadirRutina(
+            @RequestParam(value = "entrenador", required = true) Long idEntrenador, @RequestBody RutinaDTO rutinaDTO,
+            UriComponentsBuilder uriBuilder) {
         rutinaDTO.setEntrenadorId(idEntrenador);
         Rutina rutina = servicio.aniadirRutina(rutinaDTO.rutina());
         RutinaDTO rutinaCreadaDTO = RutinaDTO.fromRutina(rutina);
@@ -70,7 +73,7 @@ public class RutinaRest {
     @PutMapping("/{idRutina}")
     public ResponseEntity<RutinaDTO> actualizarRutina(@PathVariable Long idRutina, @RequestBody RutinaDTO rutinaDTO) {
         Rutina entidadRutina = rutinaDTO.rutina();
-        List<Ejs> l= entidadRutina.getEjercicios();
+        List<Ejs> l = entidadRutina.getEjercicios();
         entidadRutina.setId(idRutina);
         servicio.actualizarRutina(entidadRutina);
         entidadRutina.setEjercicios(l);
