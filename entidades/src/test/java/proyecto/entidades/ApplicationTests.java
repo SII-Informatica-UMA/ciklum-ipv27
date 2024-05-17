@@ -22,6 +22,7 @@ import proyecto.repositorios.RutinaRepository;
 import proyecto.dtos.*;
 
 import java.net.URI;
+import org.springframework.http.HttpHeaders;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,6 +38,9 @@ class ApplicationTests {
 
 	@Value(value = "${local.server.port}")
 	private int port;
+
+	@Value(value = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1OTU2ODkwLCJleHAiOjE3MjU5NTY4OTB9.fnHLue1zBs_qw86FL3XYySlmSqgE8Mr9McLx2Ycn2JJapV3QjMg0Y7LRC9f8OQadS8cp_9jV5BdqfoI_gEYECA")
+	private String jwtToken;
 
 	@Autowired
 	private RutinaRepository rutinaRepository;
@@ -68,33 +72,37 @@ class ApplicationTests {
 		return ub.build();
 	}
 
-	private RequestEntity<Void> get(String scheme, String host, int port, String path) {
+	private RequestEntity<Void> get(String scheme, String host, int port, String path, String jwtToken) {
 		URI uri = uri(scheme, host, port, 1L, path);
 		var peticion = RequestEntity.get(uri)
 				.accept(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
 				.build();
 		return peticion;
 	}
 
-	private RequestEntity<Void> delete(String scheme, String host, int port, String path) {
+	private RequestEntity<Void> delete(String scheme, String host, int port, String path, String jwtToken) {
 		URI uri = uri(scheme, host, port, null, path);
 		var peticion = RequestEntity.delete(uri)
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
 				.build();
 		return peticion;
 	}
 
-	private <T> RequestEntity<T> post(String scheme, String host, int port, String path, T object) {
+	private <T> RequestEntity<T> post(String scheme, String host, int port, String path, T object, String jwtToken) {
 		URI uri = uri(scheme, host, port, 1L, path);
 		var peticion = RequestEntity.post(uri)
 				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
 				.body(object);
 		return peticion;
 	}
 
-	private <T> RequestEntity<T> put(String scheme, String host, int port, String path, T object) {
+	private <T> RequestEntity<T> put(String scheme, String host, int port, String path, T object, String jwtToken) {
 		URI uri = uri(scheme, host, port, null, path);
 		var peticion = RequestEntity.put(uri)
 				.contentType(MediaType.APPLICATION_JSON)
+				.header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
 				.body(object);
 		return peticion;
 	}
@@ -107,7 +115,7 @@ class ApplicationTests {
 		@DisplayName("devuelve la lista de ejercicios vacía")
 		public void devuelveEjercicios() {
 
-			var peticion = get("http", "localhost", port, "/ejercicio");
+			var peticion = get("http", "localhost", port, "/ejercicio", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
 					new ParameterizedTypeReference<List<Ejercicio>>() {
@@ -121,7 +129,7 @@ class ApplicationTests {
 		@DisplayName("devuelve la lista de rutinas vacía")
 		public void devuelveRutinas() {
 
-			var peticion = get("http", "localhost", port, "/rutina");
+			var peticion = get("http", "localhost", port, "/rutina", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
 					new ParameterizedTypeReference<List<Rutina>>() {
@@ -134,7 +142,7 @@ class ApplicationTests {
 		@Test
 		@DisplayName("devuelve error al obtener un ejercicio concreto")
 		public void errorAlObtenerEjercicioConcreto() {
-			var peticion = get("http", "localhost", port, "/ejercicio/1");
+			var peticion = get("http", "localhost", port, "/ejercicio/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
 					new ParameterizedTypeReference<Ejercicio>() {
@@ -146,7 +154,7 @@ class ApplicationTests {
 		@Test
 		@DisplayName("devuelve error al obtener una rutina concreta")
 		public void errorAlObtenerRutinaConcreto() {
-			var peticion = get("http", "localhost", port, "/rutina/1");
+			var peticion = get("http", "localhost", port, "/rutina/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
 					new ParameterizedTypeReference<Rutina>() {
@@ -159,7 +167,7 @@ class ApplicationTests {
 		@DisplayName("devuelve error al modificar un ejercicio que no existe")
 		public void modificarEjercicioInexistente() {
 			var ejercicio = EjercicioDTO.builder().nombre("Ejercicio1").build();
-			var peticion = put("http", "localhost", port, "/ejercicio/1", ejercicio);
+			var peticion = put("http", "localhost", port, "/ejercicio/1", ejercicio, jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -169,7 +177,7 @@ class ApplicationTests {
 		@Test
 		@DisplayName("devuelve error al eliminar un ejercicio que no existe")
 		public void eliminarEjercicioInexistente() {
-			var peticion = delete("http", "localhost", port, "/ejercicio/1");
+			var peticion = delete("http", "localhost", port, "/ejercicio/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -179,7 +187,7 @@ class ApplicationTests {
 		@Test
 		@DisplayName("devuelve error al eliminar una rutina que no existe")
 		public void eliminarRutinaInexistente() {
-			var peticion = delete("http", "localhost", port, "/rutina/1");
+			var peticion = delete("http", "localhost", port, "/rutina/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -193,7 +201,7 @@ class ApplicationTests {
 			var ejercicio = EjercicioDTO.builder()
 					.nombre("Ejercicio1")
 					.build();
-			var peticion = post("http", "localhost", port, "/ejercicio", ejercicio);
+			var peticion = post("http", "localhost", port, "/ejercicio", ejercicio, jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -215,7 +223,7 @@ class ApplicationTests {
 			var rutina = RutinaDTO.builder()
 					.nombre("Rutina1")
 					.build();
-			var peticion = post("http", "localhost", port, "/rutina", rutina);
+			var peticion = post("http", "localhost", port, "/rutina", rutina, jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -257,7 +265,7 @@ class ApplicationTests {
 		@Test
 		@DisplayName("devuelve una lista de ejercicios")
 		public void devuelveListaEjercicios() {
-			var peticion = get("http", "localhost", port, "/ejercicio");
+			var peticion = get("http", "localhost", port, "/ejercicio", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
 					new ParameterizedTypeReference<List<Ejercicio>>() {
@@ -270,7 +278,7 @@ class ApplicationTests {
 		@Test
 		@DisplayName("devuelve una lista de rutinas")
 		public void devuelveListaRutinas() {
-			var peticion = get("http", "localhost", port, "/rutina");
+			var peticion = get("http", "localhost", port, "/rutina", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
 					new ParameterizedTypeReference<List<Rutina>>() {
@@ -315,7 +323,7 @@ class ApplicationTests {
 		@Test
 		@DisplayName("obtiene un ejercicio concreto")
 		public void obtenerEjercicioConcreto() {
-			var peticion = get("http", "localhost", port, "/ejercicio/1");
+			var peticion = get("http", "localhost", port, "/ejercicio/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
 					new ParameterizedTypeReference<Ejercicio>() {
@@ -328,7 +336,7 @@ class ApplicationTests {
 		@Test
 		@DisplayName("obtiene una rutina concreta")
 		public void obtenerRutinaConcreto() {
-			var peticion = get("http", "localhost", port, "/rutina/1");
+			var peticion = get("http", "localhost", port, "/rutina/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
 					new ParameterizedTypeReference<Rutina>() {
@@ -342,7 +350,7 @@ class ApplicationTests {
 		@DisplayName("modificar un ejercicio correctamente")
 		public void modificarEjercicio() {
 			var ejercicio = EjercicioDTO.builder().nombre("EjercicioCambio").build();
-			var peticion = put("http", "localhost", port, "/ejercicio/1", ejercicio);
+			var peticion = put("http", "localhost", port, "/ejercicio/1", ejercicio, jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -359,7 +367,7 @@ class ApplicationTests {
 			var rutina = RutinaDTO.builder().nombre("RutinaCambio").build();
 			var ejs = EjsDTO.builder().ejercicio(EjercicioDTO.fromEjercicio(ejercicio)).build();
 			rutina.setEjercicios(Collections.singletonList(ejs));
-			var peticion = put("http", "localhost", port, "/rutina/1", rutina);
+			var peticion = put("http", "localhost", port, "/rutina/1", rutina, jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -378,7 +386,7 @@ class ApplicationTests {
 			var ejs = EjsDTO.builder().ejercicio(EjercicioDTO.fromEjercicio(ejercicio)).build();
 			rutina.setEjercicios(Collections.singletonList(ejs));
 
-			var peticion = post("http", "localhost", port, "/rutina", rutina);
+			var peticion = post("http", "localhost", port, "/rutina", rutina, jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -430,7 +438,7 @@ class ApplicationTests {
 		public void modificarRutinaNoExistente() {
 			var cambio = new Rutina();
 			cambio.setNombre("Rutina2");
-			var peticion = put("http", "localhost", port, "/rutina/2", cambio);
+			var peticion = put("http", "localhost", port, "/rutina/2", cambio, jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -441,7 +449,7 @@ class ApplicationTests {
 		@DisplayName("da error al eliminar un ejercicio cuando hay una rutina que lo esta usando")
 		public void eliminarEjercicioConRutinaAsociada() {
 
-			var peticion = delete("http", "localhost", port, "/ejercicio/1");
+			var peticion = delete("http", "localhost", port, "/ejercicio/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -455,7 +463,7 @@ class ApplicationTests {
 			ejercicio.setNombre("Ejercicio2");
 			ejercicioRepository.save(ejercicio);
 
-			var peticion = delete("http", "localhost", port, "/ejercicio/2");
+			var peticion = delete("http", "localhost", port, "/ejercicio/2", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -478,7 +486,7 @@ class ApplicationTests {
 			rutina.setEjercicios(Collections.singletonList(ejs));
 			rutinaRepository.save(rutina);
 
-			var peticion = delete("http", "localhost", port, "/rutina/2");
+			var peticion = delete("http", "localhost", port, "/rutina/2", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 

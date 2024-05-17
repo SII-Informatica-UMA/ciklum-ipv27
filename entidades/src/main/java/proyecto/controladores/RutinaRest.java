@@ -91,7 +91,7 @@ public class RutinaRest {
     public void noEncontrado() {
     }
 
-    @ExceptionHandler(EntidadExistenteException.class)
+    @ExceptionHandler(UsuarioException.class)
     @ResponseStatus(code = HttpStatus.FORBIDDEN)
     public void existente() {
     }

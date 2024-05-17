@@ -37,7 +37,8 @@ public class EjercicioRest {
 
     @GetMapping
     @ResponseStatus(code = HttpStatus.OK)
-    public List<EjercicioDTO> obtenerTodosLosEjercicios(@RequestParam(value = "entrenador",required = true) Long idEntrenador) {
+    public List<EjercicioDTO> obtenerTodosLosEjercicios(
+            @RequestParam(value = "entrenador", required = true) Long idEntrenador) {
         var ejercicios = servicio.obtenerEjercicios(idEntrenador);
         Function<Ejercicio, EjercicioDTO> mapper = (ej -> EjercicioDTO.fromEjercicio(ej));
         return ejercicios.stream()
@@ -53,9 +54,9 @@ public class EjercicioRest {
                 .toUri();
     }
 
-
     @PostMapping
-    public ResponseEntity<EjercicioDTO> aniadirEjercicio(@RequestParam(value="entrenador") Long idEntrenador, @RequestBody EjercicioDTO ejercicioDTO,
+    public ResponseEntity<EjercicioDTO> aniadirEjercicio(@RequestParam(value = "entrenador") Long idEntrenador,
+            @RequestBody EjercicioDTO ejercicioDTO,
             UriComponentsBuilder uriBuilder) {
         ejercicioDTO.setEntrenadorId(idEntrenador);
         Ejercicio ejercicio = servicio.aniadirEjercicio(ejercicioDTO.ejercicio());
@@ -91,7 +92,7 @@ public class EjercicioRest {
     public void noEncontrado() {
     }
 
-    @ExceptionHandler(EntidadExistenteException.class)
+    @ExceptionHandler(UsuarioException.class)
     @ResponseStatus(code = HttpStatus.FORBIDDEN)
     public void existente() {
     }
