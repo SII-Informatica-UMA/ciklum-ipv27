@@ -3,6 +3,8 @@ package proyecto.servicios;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,10 @@ public class RutinaServicio {
     }
 
     public List<Rutina> obtenerRutinas(Long entrenadorId) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!username.equals("entrenador" + entrenadorId)) {
+            throw new SecurityException("No tienes permiso para acceder a estas rutinas");
+        }
         List<Rutina> rutinas = rutinaRepo.findAllByEntrenadorId(entrenadorId);
         return rutinas;
     }
@@ -36,6 +42,10 @@ public class RutinaServicio {
          * throw new EntidadExistenteException("La rutina ya existe");
          * }
          */
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!username.equals("entrenador" + rutina.getEntrenadorId())) {
+            throw new SecurityException("No tienes permiso para agregar esta rutina");
+        }
         List<Ejs> l = rutina.getEjercicios();
         rutina.setEjercicios(null);
         rutina = rutinaRepo.save(rutina);
@@ -49,6 +59,13 @@ public class RutinaServicio {
     }
 
     public Rutina obtenerRutina(Long id) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long entrenadorId = rutinaRepo.findById(id)
+                                    .map(rutina -> rutina.getEntrenadorId())
+                                    .orElseThrow(() -> new EntidadNoEncontradaException("La rutina con ID " + id + " no fue encontrada"));
+        if (!username.equals("entrenador" + entrenadorId)) {
+            throw new SecurityException("No tienes permiso para acceder a esta rutina");
+        }
         Optional<Rutina> optionalRutina = rutinaRepo.findById(id);
         if (optionalRutina.isPresent()) {
             return optionalRutina.get();
@@ -68,6 +85,10 @@ public class RutinaServicio {
          * throw new EntidadExistenteException("La rutina nueva ya existe");
          * } else
          */
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!username.equals("entrenador" + entidadRutina.getEntrenadorId())) {
+            throw new SecurityException("No tienes permiso para actualizar esta rutina");
+        }
         if (rutinaRepo.existsById(entidadRutina.getId())) {
             List<Ejs> l = entidadRutina.getEjercicios();
             entidadRutina.setEjercicios(null);
@@ -86,6 +107,13 @@ public class RutinaServicio {
     }
 
     public void eliminarRutina(Long id) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long entrenadorId = rutinaRepo.findById(id)
+                                        .map(rutina -> rutina.getEntrenadorId())
+                                        .orElseThrow(() -> new EntidadNoEncontradaException("La rutina con ID " + id + " no fue encontrada"));
+        if (!username.equals("entrenador" + entrenadorId)) {
+            throw new SecurityException("No tienes permiso para eliminar esta rutina");
+        }
         if (rutinaRepo.existsById(id)) {
             Rutina rutina = rutinaRepo.getReferenceById(id);
             List<Ejs> l = rutina.getEjercicios();
@@ -99,11 +127,19 @@ public class RutinaServicio {
     }
 
     public List<Ejercicio> obtenerEjercicios(Long idEntrenador) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!username.equals("entrenador" + idEntrenador)) {
+            throw new SecurityException("No tienes permiso para acceder a estos ejercicios");
+        }
         List<Ejercicio> ejercicios = ejercicioRepo.findAllByEntrenadorId(idEntrenador);
         return ejercicios;
     }
 
     public Ejercicio aniadirEjercicio(Ejercicio ejercicio) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!username.equals("entrenador" + ejercicio.getEntrenadorId())) {
+            throw new SecurityException("No tienes permiso para agregar este ejercicio");
+        }
         ejercicio.setId(null);
         ejercicio.setEjs(Collections.emptyList());
         /*
@@ -116,6 +152,13 @@ public class RutinaServicio {
     }
 
     public Ejercicio obtenerEjercicio(Long id) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long entrenadorId = ejercicioRepo.findById(id)
+                                         .map(ejercicio -> ejercicio.getEntrenadorId())
+                                         .orElseThrow(() -> new EntidadNoEncontradaException("El ejercicio con ID " + id + " no fue encontrado"));
+        if (!username.equals("entrenador" + entrenadorId)) {
+            throw new SecurityException("No tienes permiso para acceder a este ejercicio");
+        }                      
         Optional<Ejercicio> optionalEjercicio = ejercicioRepo.findById(id);
         if (optionalEjercicio.isPresent()) {
             return optionalEjercicio.get();
@@ -135,6 +178,10 @@ public class RutinaServicio {
          * EntidadExistenteException("Ya existe un ejercicio con el mismo nombre");
          * } else
          */
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (!username.equals("entrenador" + ej.getEntrenadorId())) {
+            throw new SecurityException("No tienes permiso para actualizar este ejercicio");
+        }
         if (ejercicioRepo.existsById(ej.getId())) {
             ejercicioRepo.save(ej);
         } else {
@@ -143,6 +190,13 @@ public class RutinaServicio {
     }
 
     public void eliminarEjercicio(Long id) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long entrenadorId = ejercicioRepo.findById(id)
+                                         .map(ejercicio -> ejercicio.getEntrenadorId())
+                                         .orElseThrow(() -> new EntidadNoEncontradaException("El ejercicio con ID " + id + " no fue encontrado"));
+        if (!username.equals("entrenador" + entrenadorId)) {
+            throw new SecurityException("No tienes permiso para eliminar este ejercicio");
+        }                                 
         if (ejercicioRepo.existsById(id)) {
             if (ejercicioRepo.getReferenceById(id).getEjs().isEmpty())
                 ejercicioRepo.deleteById(id);
