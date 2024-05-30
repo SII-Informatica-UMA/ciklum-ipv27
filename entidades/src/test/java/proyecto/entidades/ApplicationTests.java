@@ -38,6 +38,7 @@ import org.springframework.http.HttpHeaders;
 
 import org.springframework.http.HttpStatus;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -411,11 +412,34 @@ class ApplicationTests {
 			entrenadorDTO.setId(1L);
 			entrenadorDTO.setUsuarioId(2L);
 
+			AsigEntrenDTO ae = new AsigEntrenDTO();
+			ae.setId(1L);
+			ae.setIdCliente(1L);
+
+			List<AsigEntrenDTO> l = new ArrayList<>();
+			l.add(ae);
+
+			ClienteDTO c = new ClienteDTO();
+			c.setId(1L);
+			c.setUsuarioId(3L);
+
 			mockServer.expect(ExpectedCount.once(),
 					requestTo(new URI("http://localhost:8080/entrenador/1")))
 					.andRespond(withStatus(HttpStatus.OK)
 							.contentType(MediaType.APPLICATION_JSON)
 							.body(mapper.writeValueAsString(entrenadorDTO)));
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrena?entrenador=1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(l)));
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/cliente/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(c)));
 
 			var peticion = get("http", "localhost", port, "/ejercicio", jwtToken);
 

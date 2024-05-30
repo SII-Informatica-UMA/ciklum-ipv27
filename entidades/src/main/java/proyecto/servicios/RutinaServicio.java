@@ -19,6 +19,8 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
 
+import proyecto.dtos.AsigEntrenDTO;
+import proyecto.dtos.ClienteDTO;
 import proyecto.dtos.EntrenadorDTO;
 import proyecto.entidades.*;
 import proyecto.repositorios.*;
@@ -41,7 +43,7 @@ public class RutinaServicio {
 	@Value(value = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzE1OTU2ODkwLCJleHAiOjE3MjU5NTY4OTB9.fnHLue1zBs_qw86FL3XYySlmSqgE8Mr9McLx2Ycn2JJapV3QjMg0Y7LRC9f8OQadS8cp_9jV5BdqfoI_gEYECA")
 	private String jwtToken;
 
-    private URI uri(String scheme, String host, int port, Long entrenadorId, String... paths) {
+    private URI uri(String scheme, String host, int port, Long entrenadorId, boolean esquery, String... paths) {
 		UriBuilderFactory ubf = new DefaultUriBuilderFactory();
 		UriBuilder ub = ubf.builder()
 				.scheme(scheme)
@@ -49,14 +51,16 @@ public class RutinaServicio {
 		for (String path : paths) {
 			ub = ub.path(path);
 		}
-		if (entrenadorId != null) {
+		if (!esquery) {
             ub = ub.path("/"+entrenadorId.toString());
-		}
+		} else {
+            ub.queryParam("entrenador", entrenadorId);
+        }
 		return ub.build();
 	}
 
-    private RequestEntity<Void> get(String scheme, String host, int port, String path, String jwtToken, Long entrenadorId) {
-		URI uri = uri(scheme, host, port, entrenadorId, path);
+    private RequestEntity<Void> get(String scheme, String host, int port, String path, String jwtToken, Long entrenadorId, boolean esquery) {
+		URI uri = uri(scheme, host, port, entrenadorId, esquery, path);
 		var peticion = RequestEntity.get(uri)
 				.accept(MediaType.APPLICATION_JSON)
 				.header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken)
@@ -66,23 +70,45 @@ public class RutinaServicio {
 
     private void validarEntrenador(Long entrenadorId) {
         Optional<UserDetails> user = SecurityConfguration.getAuthenticatedUser();
-        Long usuarioId=Long.valueOf(user.get().getUsername());
-        var peticion = get("http", "localhost", port, "/entrenador", jwtToken, entrenadorId);
+        Long usuarioId = Long.valueOf(user.get().getUsername());
         try {
-            var respuesta = restTemplate.exchange(peticion,new ParameterizedTypeReference<EntrenadorDTO>() {});
-            EntrenadorDTO entrenador = respuesta.getBody();
-            if (!entrenador.getUsuarioId().equals(usuarioId)) {
-                throw new UsuarioException("El usuario " + usuarioId + " no tiene acceso a los objetos del entrenador " + entrenadorId);
+            var peticion = get("http", "localhost", port, "/entrenador", jwtToken, entrenadorId, false);
+            try {
+                var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<EntrenadorDTO>() {
+                });
+                EntrenadorDTO entrenador = respuesta.getBody();
+                if (!entrenador.getUsuarioId().equals(usuarioId)) {
+                    throw new UsuarioException("El usuario " + usuarioId
+                            + " no tiene acceso a los objetos del entrenador " + entrenadorId);
+                }
+            } catch (HttpClientErrorException e) {
+                if (e.getStatusCode().value() == 404) {
+                    throw new EntidadNoEncontradaException("El entrenador " + entrenadorId + " no existe");
+                }
             }
-        } catch(HttpClientErrorException e){
-            if(e.getStatusCode().value()==404){
-                throw new EntidadNoEncontradaException("El entrenador " + entrenadorId + " no existe");
-            }
-        }
+        } catch (UsuarioException e) {
+            var peticion = get("http", "localhost", port, "/entrena",
+                    jwtToken, entrenadorId, true);
 
-        
-        
+            boolean escliente = false;
+            var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<List<AsigEntrenDTO>>() {
+            });
+            for (AsigEntrenDTO a : respuesta.getBody()) {
+                peticion = get("http", "localhost", port, "/cliente", jwtToken, a.getIdCliente(), false);
+                var respuesta2 = restTemplate.exchange(peticion, new ParameterizedTypeReference<ClienteDTO>() {
+                });
+                if (respuesta2.getBody().getUsuarioId().equals(usuarioId)) {
+                    escliente = true;
+                }
+            }
+            if (!escliente) {
+                throw new UsuarioException(
+                        "El usuario " + usuarioId + " no tiene acceso a los objetos del entrenador " + entrenadorId);
+            }
+
+        }
     }
+
 
     public RutinaServicio(RutinaRepository rutinaRepo,
             EjercicioRepository ejercicioRepo, EjsRepository ejsRepo) {
