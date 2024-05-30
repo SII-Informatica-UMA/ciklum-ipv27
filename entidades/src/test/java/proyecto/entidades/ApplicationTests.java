@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,17 +13,31 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.client.ExpectedCount;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
 import org.springframework.web.util.UriBuilderFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import proyecto.repositorios.EjercicioRepository;
 import proyecto.repositorios.EjsRepository;
 import proyecto.repositorios.RutinaRepository;
+
 import proyecto.dtos.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.springframework.http.HttpHeaders;
+
+import org.springframework.http.HttpStatus;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +50,12 @@ class ApplicationTests {
 
 	@Autowired
 	private TestRestTemplate restTemplate;
+
+	@Autowired
+	private RestTemplate templateMocks;
+
+	private MockRestServiceServer mockServer;
+	private ObjectMapper mapper = new ObjectMapper();
 
 	@Value(value = "${local.server.port}")
 	private int port;
@@ -108,12 +129,30 @@ class ApplicationTests {
 	}
 
 	@Nested
+
 	@DisplayName("cuando la base de datos está vacía")
 	public class BaseDatosVacia {
 
+		@BeforeEach
+		public void init() {
+			MockitoAnnotations.openMocks(this);
+			mockServer = MockRestServiceServer.createServer(templateMocks);
+		}
+
 		@Test
 		@DisplayName("devuelve la lista de ejercicios vacía")
-		public void devuelveEjercicios() {
+		public void devuelveEjercicios() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
 
 			var peticion = get("http", "localhost", port, "/ejercicio", jwtToken);
 
@@ -123,11 +162,23 @@ class ApplicationTests {
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(respuesta.getBody()).isEmpty();
+			mockServer.verify();
 		}
 
 		@Test
 		@DisplayName("devuelve la lista de rutinas vacía")
-		public void devuelveRutinas() {
+		public void devuelveRutinas() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
 
 			var peticion = get("http", "localhost", port, "/rutina", jwtToken);
 
@@ -137,11 +188,24 @@ class ApplicationTests {
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(respuesta.getBody()).isEmpty();
+			mockServer.verify();
 		}
 
 		@Test
 		@DisplayName("devuelve error al obtener un ejercicio concreto")
-		public void errorAlObtenerEjercicioConcreto() {
+		public void errorAlObtenerEjercicioConcreto() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var peticion = get("http", "localhost", port, "/ejercicio/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
@@ -149,11 +213,24 @@ class ApplicationTests {
 					});
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+
 		}
 
 		@Test
 		@DisplayName("devuelve error al obtener una rutina concreta")
-		public void errorAlObtenerRutinaConcreto() {
+		public void errorAlObtenerRutinaConcreto() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var peticion = get("http", "localhost", port, "/rutina/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
@@ -165,9 +242,22 @@ class ApplicationTests {
 
 		@Test
 		@DisplayName("devuelve error al modificar un ejercicio que no existe")
-		public void modificarEjercicioInexistente() {
+		public void modificarEjercicioInexistente() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var ejercicio = EjercicioDTO.builder().nombre("Ejercicio1").build();
-			var peticion = put("http", "localhost", port, "/ejercicio/1", ejercicio, jwtToken);
+			var peticion = put("http", "localhost", port, "/ejercicio/1", ejercicio,
+					jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -176,7 +266,19 @@ class ApplicationTests {
 
 		@Test
 		@DisplayName("devuelve error al eliminar un ejercicio que no existe")
-		public void eliminarEjercicioInexistente() {
+		public void eliminarEjercicioInexistente() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var peticion = delete("http", "localhost", port, "/ejercicio/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
@@ -186,7 +288,19 @@ class ApplicationTests {
 
 		@Test
 		@DisplayName("devuelve error al eliminar una rutina que no existe")
-		public void eliminarRutinaInexistente() {
+		public void eliminarRutinaInexistente() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var peticion = delete("http", "localhost", port, "/rutina/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
@@ -196,12 +310,24 @@ class ApplicationTests {
 
 		@Test
 		@DisplayName("inserta correctamente un ejercicio")
-		public void insertaEjercicio() {
+		public void insertaEjercicio() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
 
 			var ejercicio = EjercicioDTO.builder()
 					.nombre("Ejercicio1")
 					.build();
-			var peticion = post("http", "localhost", port, "/ejercicio", ejercicio, jwtToken);
+			var peticion = post("http", "localhost", port, "/ejercicio", ejercicio,
+					jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
@@ -214,11 +340,23 @@ class ApplicationTests {
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 					.endsWith("/" + ejercicioBD.get(0).getId());
 			assertThat(ejercicio.getNombre()).isEqualTo(ejercicioBD.get(0).getNombre());
+			mockServer.verify();
 		}
 
 		@Test
 		@DisplayName("inserta correctamente una rutina")
-		public void insertaRutina() {
+		public void insertaRutina() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
 
 			var rutina = RutinaDTO.builder()
 					.nombre("Rutina1")
@@ -236,16 +374,20 @@ class ApplicationTests {
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 					.endsWith("/" + rutinasBD.get(0).getId());
 			assertThat(rutina.getNombre()).isEqualTo(rutinasBD.get(0).getNombre());
+			mockServer.verify();
 		}
 
 	}
 
 	@Nested
+
 	@DisplayName("cuando la base de datos tiene datos")
 	public class BaseDatosLlena {
 
 		@BeforeEach
 		public void insertarDatos() {
+			MockitoAnnotations.openMocks(this);
+			mockServer = MockRestServiceServer.createServer(templateMocks);
 			var ejercicio = new Ejercicio();
 			ejercicio.setNombre("Ejercicio1");
 			ejercicio.setEntrenadorId(1L);
@@ -263,8 +405,58 @@ class ApplicationTests {
 		}
 
 		@Test
+		@DisplayName("devuelve error cuando un usuario no tiene acceso a los objetos del entrenador")
+		public void entrenadorInexistente() throws JsonProcessingException, URISyntaxException {
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(2L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
+			var peticion = get("http", "localhost", port, "/ejercicio", jwtToken);
+
+			var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<List<Ejercicio>>() {
+			});
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+		}
+
+		// @Test
+		// @DisplayName("devuelve error cuando el entrenador no existe")
+		// public void testEntrenadorNoExiste() throws URISyntaxException {
+
+		// mockServer.expect(ExpectedCount.once(),
+		// requestTo(new URI("http://localhost:8080/entrenador/2")))
+		// .andRespond(withStatus(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON));
+
+		// RequestEntity<Void> peticion = get("http", "localhost", port, "/ejercicio",
+		// jwtToken);
+		// var respuesta = restTemplate.exchange(peticion,
+		// new ParameterizedTypeReference<List<Ejercicio>>() {
+		// });
+		// assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+
+		// }
+
+		@Test
 		@DisplayName("devuelve una lista de ejercicios")
-		public void devuelveListaEjercicios() {
+		public void devuelveListaEjercicios() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var peticion = get("http", "localhost", port, "/ejercicio", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
@@ -273,11 +465,25 @@ class ApplicationTests {
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(respuesta.getBody().size()).isEqualTo(1);
+			mockServer.verify();
 		}
 
 		@Test
+
 		@DisplayName("devuelve una lista de rutinas")
-		public void devuelveListaRutinas() {
+		public void devuelveListaRutinas() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var peticion = get("http", "localhost", port, "/rutina", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
@@ -286,43 +492,25 @@ class ApplicationTests {
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(respuesta.getBody().size()).isEqualTo(1);
+			mockServer.verify();
 		}
 
-		/*
-		 * @Test
-		 * 
-		 * @DisplayName("da error cuando inserta un ejercicio que ya existe")
-		 * public void insertaEjercicioExistente() {
-		 * 
-		 * var ejercicio = EjercicioDTO.builder()
-		 * .nombre("Ejercicio1")
-		 * .build();
-		 * var peticion = post("http", "localhost", port, "/ejercicio", ejercicio);
-		 * 
-		 * var respuesta = restTemplate.exchange(peticion, Void.class);
-		 * 
-		 * assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
-		 * }
-		 * 
-		 * @Test
-		 * 
-		 * @DisplayName("da error cuando inserta una rutina que ya existe")
-		 * public void insertaRutinaExistente() {
-		 * 
-		 * var rutina = RutinaDTO.builder()
-		 * .nombre("Rutina1")
-		 * .build();
-		 * var peticion = post("http", "localhost", port, "/rutina", rutina);
-		 * 
-		 * var respuesta = restTemplate.exchange(peticion, Void.class);
-		 * 
-		 * assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
-		 * }
-		 */
-
 		@Test
+
 		@DisplayName("obtiene un ejercicio concreto")
-		public void obtenerEjercicioConcreto() {
+		public void obtenerEjercicioConcreto() throws URISyntaxException,
+				JsonProcessingException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var peticion = get("http", "localhost", port, "/ejercicio/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
@@ -331,11 +519,25 @@ class ApplicationTests {
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(respuesta.getBody().getNombre()).isEqualTo("Ejercicio1");
+			mockServer.verify();
 		}
 
 		@Test
+
 		@DisplayName("obtiene una rutina concreta")
-		public void obtenerRutinaConcreto() {
+		public void obtenerRutinaConcreto() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var peticion = get("http", "localhost", port, "/rutina/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion,
@@ -344,40 +546,86 @@ class ApplicationTests {
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(respuesta.getBody().getNombre()).isEqualTo("Rutina1");
+			mockServer.verify();
 		}
 
 		@Test
+
 		@DisplayName("modificar un ejercicio correctamente")
-		public void modificarEjercicio() {
+		public void modificarEjercicio() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var ejercicio = EjercicioDTO.builder().nombre("EjercicioCambio").build();
-			var peticion = put("http", "localhost", port, "/ejercicio/1", ejercicio, jwtToken);
+			ejercicio.setEntrenadorId(1L);
+			var peticion = put("http", "localhost", port, "/ejercicio/1", ejercicio,
+					jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-			assertThat(ejercicioRepository.findById(1L).get().getNombre()).isEqualTo("EjercicioCambio");
+			assertThat(ejercicioRepository.findById(1L).get().getNombre()).isEqualTo(
+					"EjercicioCambio");
+			mockServer.verify();
 		}
 
 		@Test
+
 		@DisplayName("modificar una rutina correctamente")
-		public void modificarRutina() {
+		public void modificarRutina() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var ejercicio = ejercicioRepository.findById(1L)
 					.orElseThrow(() -> new RuntimeException("Ejercicio not found"));
 
 			var rutina = RutinaDTO.builder().nombre("RutinaCambio").build();
 			var ejs = EjsDTO.builder().ejercicio(EjercicioDTO.fromEjercicio(ejercicio)).build();
 			rutina.setEjercicios(Collections.singletonList(ejs));
+			rutina.setEntrenadorId(1L);
 			var peticion = put("http", "localhost", port, "/rutina/1", rutina, jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
-			assertThat(rutinaRepository.findById(1L).get().getNombre()).isEqualTo("RutinaCambio");
+			assertThat(rutinaRepository.findById(1L).get().getNombre()).isEqualTo(
+					"RutinaCambio");
+			mockServer.verify();
 		}
 
 		@Test
+
 		@DisplayName("inserta correctamente una rutina con ejercicio")
-		public void insertaRutina() {
+		public void insertaRutina() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
 
 			var ejercicio = ejercicioRepository.findById(1L)
 					.orElseThrow(() -> new RuntimeException("Ejercicio not found"));
@@ -399,43 +647,25 @@ class ApplicationTests {
 			assertThat(respuesta.getHeaders().get("Location").get(0))
 					.endsWith("/" + rutinasBD.get(1).getId());
 			assertThat(rutina.getNombre()).isEqualTo(rutinasBD.get(1).getNombre());
+			mockServer.verify();
 		}
 
-		/*
-		 * @Test
-		 * 
-		 * @DisplayName("da error al modificar un ejercicio con un nombre ya existente")
-		 * public void modificarEjercicioConNombreExistente() {
-		 * var cambio = new Ejercicio();
-		 * cambio.setNombre("Ejercicio2");
-		 * ejercicioRepository.save(cambio);
-		 * var ejercicio = EjercicioDTO.builder().nombre("Ejercicio1").build();
-		 * var peticion = put("http", "localhost", port, "/ejercicio/2", ejercicio);
-		 * 
-		 * var respuesta = restTemplate.exchange(peticion, Void.class);
-		 * 
-		 * assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
-		 * }
-		 * 
-		 * @Test
-		 * 
-		 * @DisplayName("da error al modificar una rutina con un nombre ya existente")
-		 * public void modificarRutinaConNombreExistente() {
-		 * var cambio = new Rutina();
-		 * cambio.setNombre("Rutina2");
-		 * rutinaRepository.save(cambio);
-		 * var rutina = RutinaDTO.builder().nombre("Rutina1").build();
-		 * var peticion = put("http", "localhost", port, "/rutina/2", rutina);
-		 * 
-		 * var respuesta = restTemplate.exchange(peticion, Void.class);
-		 * 
-		 * assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
-		 * }
-		 */
-
 		@Test
+
 		@DisplayName("da error al modificar una rutina que no existe")
-		public void modificarRutinaNoExistente() {
+		public void modificarRutinaNoExistente() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var cambio = new Rutina();
 			cambio.setNombre("Rutina2");
 			var peticion = put("http", "localhost", port, "/rutina/2", cambio, jwtToken);
@@ -443,24 +673,51 @@ class ApplicationTests {
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+
 		}
 
 		@Test
+
 		@DisplayName("da error al eliminar un ejercicio cuando hay una rutina que lo esta usando")
-		public void eliminarEjercicioConRutinaAsociada() {
+		public void eliminarEjercicioConRutinaAsociada() throws JsonProcessingException, URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
 
 			var peticion = delete("http", "localhost", port, "/ejercicio/1", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(417);
+			mockServer.verify();
 		}
 
 		@Test
+
 		@DisplayName("eliminar un ejercicio correctamente")
-		public void eliminarEjercicio() {
+		public void eliminarEjercicio() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var ejercicio = new Ejercicio();
 			ejercicio.setNombre("Ejercicio2");
+			ejercicio.setEntrenadorId(1L);
 			ejercicioRepository.save(ejercicio);
 
 			var peticion = delete("http", "localhost", port, "/ejercicio/2", jwtToken);
@@ -469,11 +726,25 @@ class ApplicationTests {
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(ejercicioRepository.count()).isEqualTo(1);
+			mockServer.verify();
 		}
 
 		@Test
+
 		@DisplayName("eliminar una rutina correctamente")
-		public void eliminarRutina() {
+		public void eliminarRutina() throws JsonProcessingException,
+				URISyntaxException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
 			var ejercicio = ejercicioRepository.findById(1L)
 					.orElseThrow(() -> new RuntimeException("Ejercicio not found"));
 
@@ -484,6 +755,7 @@ class ApplicationTests {
 			var ejs = new Ejs(ejsId, ejercicio, rutina, 0L, 0L, 0L);
 			ejsRepository.save(ejs);
 			rutina.setEjercicios(Collections.singletonList(ejs));
+			rutina.setEntrenadorId(1L);
 			rutinaRepository.save(rutina);
 
 			var peticion = delete("http", "localhost", port, "/rutina/2", jwtToken);
@@ -492,6 +764,7 @@ class ApplicationTests {
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
 			assertThat(rutinaRepository.count()).isEqualTo(1);
+			mockServer.verify();
 		}
 
 	}
