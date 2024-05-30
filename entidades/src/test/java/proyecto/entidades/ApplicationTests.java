@@ -405,8 +405,8 @@ class ApplicationTests {
 		}
 
 		@Test
-		@DisplayName("devuelve error cuando un usuario no tiene acceso a los objetos del entrenador")
-		public void entrenadorInexistente() throws JsonProcessingException, URISyntaxException {
+		@DisplayName("devuelve error cuando un usuario no tiene acceso a los ejercicios del entrenador")
+		public void noAutorizacionEjercicios() throws JsonProcessingException, URISyntaxException {
 			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
 			entrenadorDTO.setId(1L);
 			entrenadorDTO.setUsuarioId(2L);
@@ -425,22 +425,26 @@ class ApplicationTests {
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
 		}
 
-		// @Test
-		// @DisplayName("devuelve error cuando el entrenador no existe")
-		// public void testEntrenadorNoExiste() throws URISyntaxException {
+		@Test
+		@DisplayName("devuelve error cuando un usuario no tiene acceso a las rutinas del entrenador")
+		public void noAutorizacionRutinas() throws JsonProcessingException, URISyntaxException {
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(2L);
 
-		// mockServer.expect(ExpectedCount.once(),
-		// requestTo(new URI("http://localhost:8080/entrenador/2")))
-		// .andRespond(withStatus(HttpStatus.NOT_FOUND).contentType(MediaType.APPLICATION_JSON));
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
 
-		// RequestEntity<Void> peticion = get("http", "localhost", port, "/ejercicio",
-		// jwtToken);
-		// var respuesta = restTemplate.exchange(peticion,
-		// new ParameterizedTypeReference<List<Ejercicio>>() {
-		// });
-		// assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+			var peticion = get("http", "localhost", port, "/rutina", jwtToken);
 
-		// }
+			var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<List<Ejercicio>>() {
+			});
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+		}
 
 		@Test
 		@DisplayName("devuelve una lista de ejercicios")
@@ -674,6 +678,24 @@ class ApplicationTests {
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
 
+		}
+
+		@Test
+
+		@DisplayName("da error al intentar acceder como un entrenador que no existe")
+		public void EntrenadorNoExistente() throws JsonProcessingException,
+				URISyntaxException {
+
+			mockServer.expect(ExpectedCount.once(),
+				requestTo(new URI("http://localhost:8080/entrenador/1")))
+				.andRespond(withStatus(HttpStatus.NOT_FOUND));
+
+			var peticion = get("http", "localhost", port, "/rutina/1", jwtToken);
+
+			var respuesta = restTemplate.exchange(peticion, Void.class);
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
+			mockServer.verify();
 		}
 
 		@Test

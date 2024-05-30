@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
@@ -67,14 +68,20 @@ public class RutinaServicio {
         Optional<UserDetails> user = SecurityConfguration.getAuthenticatedUser();
         Long usuarioId=Long.valueOf(user.get().getUsername());
         var peticion = get("http", "localhost", port, "/entrenador", jwtToken, entrenadorId);
-        var respuesta = restTemplate.exchange(peticion,new ParameterizedTypeReference<EntrenadorDTO>() {});
-        if(respuesta.getStatusCode().value()==404){
-            throw new EntidadNoEncontradaException("El entrenador " + entrenadorId + " no existe");
+        try {
+            var respuesta = restTemplate.exchange(peticion,new ParameterizedTypeReference<EntrenadorDTO>() {});
+            EntrenadorDTO entrenador = respuesta.getBody();
+            if (!entrenador.getUsuarioId().equals(usuarioId)) {
+                throw new UsuarioException("El usuario " + usuarioId + " no tiene acceso a los objetos del entrenador " + entrenadorId);
+            }
+        } catch(HttpClientErrorException e){
+            if(e.getStatusCode().value()==404){
+                throw new EntidadNoEncontradaException("El entrenador " + entrenadorId + " no existe");
+            }
         }
-        EntrenadorDTO entrenador = respuesta.getBody();
-        if (!entrenador.getUsuarioId().equals(usuarioId)) {
-            throw new UsuarioException("El usuario " + usuarioId + " no tiene acceso a los objetos del entrenador " + entrenadorId);
-        }
+
+        
+        
     }
 
     public RutinaServicio(RutinaRepository rutinaRepo,
