@@ -3,9 +3,6 @@ package proyecto.entidades;
 import java.util.List;
 import java.util.Objects;
 import jakarta.persistence.*;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 
 @Entity
 public class Ejercicio {
@@ -23,6 +20,7 @@ public class Ejercicio {
     private String musculosTrabajados;
     private String material;
     private String dificultad;
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> multimedia;
 
     @OneToMany(mappedBy = "ejercicio")

@@ -406,8 +406,8 @@ class ApplicationTests {
 		}
 
 		@Test
-		@DisplayName("devuelve error cuando un usuario no tiene acceso a los ejercicios del entrenador")
-		public void noAutorizacionEjercicios() throws JsonProcessingException, URISyntaxException {
+		@DisplayName("devuelve error cuando un usuario no tiene acceso a un ejercicio concreto del entrenador")
+		public void noAutorizacionEjercicio() throws JsonProcessingException, URISyntaxException {
 			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
 			entrenadorDTO.setId(1L);
 			entrenadorDTO.setUsuarioId(2L);
@@ -441,20 +441,32 @@ class ApplicationTests {
 							.contentType(MediaType.APPLICATION_JSON)
 							.body(mapper.writeValueAsString(c)));
 
-			var peticion = get("http", "localhost", port, "/ejercicio", jwtToken);
+			var peticion = get("http", "localhost", port, "/ejercicio/1", jwtToken);
 
-			var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<List<Ejercicio>>() {
+			var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<Ejercicio>() {
 			});
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+			mockServer.verify();
 		}
 
 		@Test
-		@DisplayName("devuelve error cuando un usuario no tiene acceso a las rutinas del entrenador")
-		public void noAutorizacionRutinas() throws JsonProcessingException, URISyntaxException {
+		@DisplayName("devuelve error cuando un usuario no tiene acceso a una rutina concreta del entrenador")
+		public void noAutorizacionRutina() throws JsonProcessingException, URISyntaxException {
 			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
 			entrenadorDTO.setId(1L);
 			entrenadorDTO.setUsuarioId(2L);
+
+			AsigEntrenDTO ae = new AsigEntrenDTO();
+			ae.setId(1L);
+			ae.setIdCliente(1L);
+
+			List<AsigEntrenDTO> l = new ArrayList<>();
+			l.add(ae);
+
+			ClienteDTO c = new ClienteDTO();
+			c.setId(1L);
+			c.setUsuarioId(3L);
 
 			mockServer.expect(ExpectedCount.once(),
 					requestTo(new URI("http://localhost:8080/entrenador/1")))
@@ -462,12 +474,49 @@ class ApplicationTests {
 							.contentType(MediaType.APPLICATION_JSON)
 							.body(mapper.writeValueAsString(entrenadorDTO)));
 
-			var peticion = get("http", "localhost", port, "/rutina", jwtToken);
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrena?entrenador=1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(l)));
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/cliente/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(c)));
+
+			var peticion = get("http", "localhost", port, "/rutina/1", jwtToken);
+
+			var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<Rutina>() {
+			});
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+			mockServer.verify();
+		}
+
+		@Test
+		@DisplayName("devuelve error cuando un usuario no tiene acceso a los ejercicios del entrenador")
+		public void noAutorizacionEjercicios() throws JsonProcessingException, URISyntaxException {
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(2L);
+
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
+
+			var peticion = get("http", "localhost", port, "/ejercicio", jwtToken);
 
 			var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<List<Ejercicio>>() {
 			});
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(403);
+			mockServer.verify();
 		}
 
 		@Test
@@ -525,8 +574,8 @@ class ApplicationTests {
 
 		@Test
 
-		@DisplayName("obtiene un ejercicio concreto")
-		public void obtenerEjercicioConcreto() throws URISyntaxException,
+		@DisplayName("obtiene un ejercicio concreto como entrenador")
+		public void obtenerEjercicioConcretoEntrenador() throws URISyntaxException,
 				JsonProcessingException {
 
 			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
@@ -552,7 +601,57 @@ class ApplicationTests {
 
 		@Test
 
-		@DisplayName("obtiene una rutina concreta")
+		@DisplayName("obtiene un ejercicio concreto como cliente")
+		public void obtenerEjercicioConcretoCliente() throws URISyntaxException,
+				JsonProcessingException {
+
+			EntrenadorDTO entrenadorDTO = new EntrenadorDTO();
+			entrenadorDTO.setId(1L);
+			entrenadorDTO.setUsuarioId(2L);
+
+			AsigEntrenDTO ae = new AsigEntrenDTO();
+			ae.setId(1L);
+			ae.setIdCliente(1L);
+
+			List<AsigEntrenDTO> l = new ArrayList<>();
+			l.add(ae);
+
+			ClienteDTO c = new ClienteDTO();
+			c.setId(1L);
+			c.setUsuarioId(1L);
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrenador/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(entrenadorDTO)));
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/entrena?entrenador=1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(l)));
+
+			mockServer.expect(ExpectedCount.once(),
+					requestTo(new URI("http://localhost:8080/cliente/1")))
+					.andRespond(withStatus(HttpStatus.OK)
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(mapper.writeValueAsString(c)));
+
+			var peticion = get("http", "localhost", port, "/ejercicio/1", jwtToken);
+
+			var respuesta = restTemplate.exchange(peticion,
+					new ParameterizedTypeReference<Ejercicio>() {
+					});
+
+			assertThat(respuesta.getStatusCode().value()).isEqualTo(200);
+			assertThat(respuesta.getBody().getNombre()).isEqualTo("Ejercicio1");
+			mockServer.verify();
+		}
+
+		@Test
+
+		@DisplayName("obtiene una rutina concreta como entrenador")
 		public void obtenerRutinaConcreto() throws JsonProcessingException,
 				URISyntaxException {
 
@@ -701,7 +800,6 @@ class ApplicationTests {
 			var respuesta = restTemplate.exchange(peticion, Void.class);
 
 			assertThat(respuesta.getStatusCode().value()).isEqualTo(404);
-
 		}
 
 		@Test

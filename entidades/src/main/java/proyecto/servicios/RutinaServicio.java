@@ -68,7 +68,7 @@ public class RutinaServicio {
 		return peticion;
 	}
 
-    private void validarEntrenador(Long entrenadorId) {
+    private void validarEntrenador(Long entrenadorId, boolean validarCliente) {
         Optional<UserDetails> user = SecurityConfguration.getAuthenticatedUser();
         Long usuarioId = Long.valueOf(user.get().getUsername());
         try {
@@ -87,23 +87,29 @@ public class RutinaServicio {
                 }
             }
         } catch (UsuarioException e) {
-            var peticion = get("http", "localhost", port, "/entrena",
-                    jwtToken, entrenadorId, true);
+            if (validarCliente) {
+                var peticion = get("http", "localhost", port, "/entrena",
+                        jwtToken, entrenadorId, true);
 
-            boolean escliente = false;
-            var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<List<AsigEntrenDTO>>() {
-            });
-            for (AsigEntrenDTO a : respuesta.getBody()) {
-                peticion = get("http", "localhost", port, "/cliente", jwtToken, a.getIdCliente(), false);
-                var respuesta2 = restTemplate.exchange(peticion, new ParameterizedTypeReference<ClienteDTO>() {
+                boolean escliente = false;
+                var respuesta = restTemplate.exchange(peticion, new ParameterizedTypeReference<List<AsigEntrenDTO>>() {
                 });
-                if (respuesta2.getBody().getUsuarioId().equals(usuarioId)) {
-                    escliente = true;
+                for (AsigEntrenDTO a : respuesta.getBody()) {
+                    peticion = get("http", "localhost", port, "/cliente", jwtToken, a.getIdCliente(), false);
+                    var respuesta2 = restTemplate.exchange(peticion, new ParameterizedTypeReference<ClienteDTO>() {
+                    });
+                    if (respuesta2.getBody().getUsuarioId().equals(usuarioId)) {
+                        escliente = true;
+                    }
                 }
-            }
-            if (!escliente) {
-                throw new UsuarioException(
-                        "El usuario " + usuarioId + " no tiene acceso a los objetos del entrenador " + entrenadorId);
+                if (!escliente) {
+                    throw new UsuarioException(
+                            "El usuario " + usuarioId + " no tiene acceso a los objetos del entrenador "
+                                    + entrenadorId);
+                }
+            } else {
+                throw new UsuarioException("El usuario " + usuarioId
+                        + " no tiene acceso a los objetos del entrenador " + entrenadorId);
             }
 
         }
@@ -118,12 +124,12 @@ public class RutinaServicio {
     }
 
     public List<Rutina> obtenerRutinas(Long entrenadorId) {
-        validarEntrenador(entrenadorId);
+        validarEntrenador(entrenadorId, false);
         return rutinaRepo.findAllByEntrenadorId(entrenadorId);
     }
 
     public Rutina aniadirRutina(Rutina rutina) {
-        validarEntrenador(rutina.getEntrenadorId());
+        validarEntrenador(rutina.getEntrenadorId(), false);
         List<Ejs> l = rutina.getEjercicios();
         rutina.setEjercicios(null);
         rutina = rutinaRepo.save(rutina);
@@ -140,7 +146,7 @@ public class RutinaServicio {
         Optional<Rutina> optionalRutina = rutinaRepo.findById(id);
         if (optionalRutina.isPresent()) {
             Rutina ans = optionalRutina.get();
-            validarEntrenador(ans.getEntrenadorId());
+            validarEntrenador(ans.getEntrenadorId(), true);
             return ans;
         } else {
             throw new EntidadNoEncontradaException("La rutina con ID " + id + " no fue encontrada");
@@ -149,7 +155,7 @@ public class RutinaServicio {
 
     public void actualizarRutina(Rutina entidadRutina) {
         if (rutinaRepo.existsById(entidadRutina.getId())) {
-            validarEntrenador(entidadRutina.getEntrenadorId());
+            validarEntrenador(entidadRutina.getEntrenadorId(), false);
             List<Ejs> l = entidadRutina.getEjercicios();
             entidadRutina.setEjercicios(null);
             entidadRutina = rutinaRepo.save(entidadRutina);
@@ -168,7 +174,7 @@ public class RutinaServicio {
     public void eliminarRutina(Long id) {
         if (rutinaRepo.existsById(id)) {
             Rutina rutina = rutinaRepo.getReferenceById(id);
-            validarEntrenador(rutina.getEntrenadorId());
+            validarEntrenador(rutina.getEntrenadorId(), false);
             List<Ejs> l = rutina.getEjercicios();
             for (Ejs e : l) {
                 ejsRepo.deleteById(e.getId());
@@ -180,12 +186,12 @@ public class RutinaServicio {
     }
 
     public List<Ejercicio> obtenerEjercicios(Long idEntrenador) {
-        validarEntrenador(idEntrenador);
+        validarEntrenador(idEntrenador, false);
         return ejercicioRepo.findAllByEntrenadorId(idEntrenador);  
     }
 
     public Ejercicio aniadirEjercicio(Ejercicio ejercicio) {
-        validarEntrenador(ejercicio.getEntrenadorId());
+        validarEntrenador(ejercicio.getEntrenadorId(), false);
         ejercicio.setId(null);
         ejercicio.setEjs(Collections.emptyList());
         return ejercicioRepo.save(ejercicio);
@@ -195,7 +201,7 @@ public class RutinaServicio {
         Optional<Ejercicio> optionalEjercicio = ejercicioRepo.findById(id);
         if (optionalEjercicio.isPresent()) {
             Ejercicio ans = optionalEjercicio.get();
-            validarEntrenador(ans.getEntrenadorId());
+            validarEntrenador(ans.getEntrenadorId(), true);
             return ans;
         } else {
             throw new EntidadNoEncontradaException("El ejercicio con ID " + id + " no fue encontrada");
@@ -204,7 +210,7 @@ public class RutinaServicio {
 
     public void actualizarEjercicio(Ejercicio ej) {
         if (ejercicioRepo.existsById(ej.getId())) {
-            validarEntrenador(ej.getEntrenadorId());
+            validarEntrenador(ej.getEntrenadorId(), false);
             ejercicioRepo.save(ej);
         } else {
             throw new EntidadNoEncontradaException("El ejercicio con ID " + ej.getId() + " no fue encontrado");
@@ -214,7 +220,7 @@ public class RutinaServicio {
     public void eliminarEjercicio(Long id) {
         if (ejercicioRepo.existsById(id)) {
             Ejercicio ejercicio = ejercicioRepo.getReferenceById(id);
-            validarEntrenador(ejercicio.getEntrenadorId());
+            validarEntrenador(ejercicio.getEntrenadorId(), false);
             if (ejercicioRepo.getReferenceById(id).getEjs().isEmpty())
                 ejercicioRepo.deleteById(id);
             else
