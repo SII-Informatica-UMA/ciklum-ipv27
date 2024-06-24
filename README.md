@@ -1,1 +1,4 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/5-86A-DI)
+Group Project with the aim of implementing both the frontend and backend of the following microservice:
+
+CRUD for Exercises and Routines Defined by Trainers for Monitored Clients
+This system will allow trainers to define exercises by adding a description, photo, and video (link to a video on platforms like YouTube or Vimeo). It will also enable the creation of routines, which are exercises grouped into sets with a specified duration or number of repetitions.
